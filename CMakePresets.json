@@ -1,0 +1,119 @@
+﻿{
+	"version": 3,
+	"configurePresets": [
+		{
+			"name": "windows-base",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"installDir": "${sourceDir}/out/install/${presetName}",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "cl.exe",
+				"CMAKE_CXX_COMPILER": "cl.exe",
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "macos-base",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"installDir": "${sourceDir}/out/install/${presetName}",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "/usr/bin/clang",
+				"CMAKE_CXX_COMPILER": "/usr/bin/clang++"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Darwin"
+			}
+		},
+		{
+			"name": "linux-base",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"installDir": "${sourceDir}/out/install/${presetName}",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "/usr/bin/gcc",
+				"CMAKE_CXX_COMPILER": "/usr/bin/g++"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "x64-debug",
+			"displayName": "x64 Debug",
+			"configurePreset": "windows-base",
+			"configuration": "Debug",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "x64-release",
+			"displayName": "x64 Release",
+			"configurePreset": "windows-base",
+			"configuration": "Release",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "macos-debug",
+			"displayName": "macOS Debug",
+			"configurePreset": "macos-base",
+			"configuration": "Debug",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Darwin"
+			}
+		},
+		{
+			"name": "macos-release",
+			"displayName": "macOS Release",
+			"configurePreset": "macos-base",
+			"configuration": "Release",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Darwin"
+			}
+		},
+		{
+			"name": "linux-debug",
+			"displayName": "Linux Debug",
+			"configurePreset": "linux-base",
+			"configuration": "Debug",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "linux-release",
+			"displayName": "Linux Release",
+			"configurePreset": "linux-base",
+			"configuration": "Release",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		}
+	]
+}

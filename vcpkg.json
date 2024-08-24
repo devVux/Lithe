@@ -1,0 +1,12 @@
+{
+	"dependencies": [
+		"entt",
+		"glfw3",
+		"glm",
+		"gtest",
+		"spdlog",
+		"stb",
+		"box2d",
+		"llgl"
+	]
+}
