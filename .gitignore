@@ -2,11 +2,4 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/Lithe/FileContentIndex
-/.vs/Lithe/v17/ipch/AutoPCH
-/.vs/Lithe/v17
-/.vs/cmake.db
-/.vs/CMakeWorkspaceSettings.json
-/.vs/ProjectSettings.json
-/.vs/slnx.sqlite
-/.vs/VSWorkspaceState.json
+.vs/
