@@ -1,0 +1,43 @@
+name: 'CMake Build Matrix'
+on: push
+jobs:
+  job:
+    name: Build Matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        include:
+          - os: macos-latest
+            triplet: x64-osx
+            configurePreset: 'macos-base'
+          - os: ubuntu-latest
+            triplet: x64-linux
+            configurePreset: 'linux-base'
+
+    env:
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+    steps:
+      - name: Hello step
+        run: echo "Hello world"
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - uses: lukka/get-cmake@latest
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        id: runvcpkg
+        with:
+          vcpkgJsonGlob: 'vcpkg.json'
+
+      - name: Prints output of run-vcpkg's action.
+        run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}' "
+      - name: Run CMake+vcpkg+NinjaMulti-Config (Release configuration)
+        uses: lukka/run-cmake@v10
+        id: runcmake
+        with:
+          configurePreset: ${{ matrix.configurePreset }}
+          buildPreset: 'x64-release'
