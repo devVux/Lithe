@@ -30,7 +30,7 @@
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "clang",
 				"CMAKE_CXX_COMPILER": "clang++",
-				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg1/scripts/buildsystems/vcpkg.cmake"
 			},
 			"condition": {
 				"type": "equals",
