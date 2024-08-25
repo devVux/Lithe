@@ -12,9 +12,11 @@ jobs:
           - os: macos-latest
             triplet: x64-osx
             configurePreset: 'macos-base'
+            buildPreset: 'macos-release'
           - os: ubuntu-latest
             triplet: x64-linux
             configurePreset: 'linux-base'
+            buildPreset: 'linux-release'
 
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
@@ -40,4 +42,4 @@ jobs:
         id: runcmake
         with:
           configurePreset: ${{ matrix.configurePreset }}
-          buildPreset: 'x64-release'
+          buildPreset: ${{ matrix.buildPreset }}
