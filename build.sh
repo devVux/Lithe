@@ -9,11 +9,20 @@ while getopts "c:b:" opt; do
   esac
 done
 
+# Ensure CONFIGURE_PRESET and BUILD_PRESET are set
+if [ -z "$CONFIGURE_PRESET" ]; then
+  error_exit "Configuration preset (-c) is required"
+fi
+
+if [ -z "$BUILD_PRESET" ]; then
+  error_exit "Build preset (-b) is required"
+fi
+
 echo "Running CMake configuration with preset $CONFIGURE_PRESET..."
 cmake --preset $CONFIGURE_PRESET
 
 echo "Building project with preset $BUILD_PRESET..."
-cmake --build --preset $BUILD_PRESET --verbose
+cmake --build --preset $BUILD_PRESET
 
 
 

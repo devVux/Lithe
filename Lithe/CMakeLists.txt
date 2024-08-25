@@ -6,7 +6,7 @@ project(${PROJECT_NAME})
 find_package(spdlog REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
-find_package(stb REQUIRED)
+find_package(Stb REQUIRED)
 find_package(box2d REQUIRED)
 find_package(LLGL REQUIRED)
 
@@ -42,7 +42,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     spdlog::spdlog
     glfw
     glm::glm
-    ${Stb_INCLUDE_DIR}
     box2d::box2d
 	LLGL::LLGL 
 )

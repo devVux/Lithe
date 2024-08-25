@@ -14,8 +14,4 @@ if not exist "%VCPKG_DIR%\vcpkg\vcpkg.exe" (
 echo Installing dependencies with vcpkg...
 "%VCPKG_DIR%\vcpkg\vcpkg.exe" install
 
-:: Set up the Visual Studio environment
-echo Setting up Visual Studio environment...
-call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
-
 endlocal
