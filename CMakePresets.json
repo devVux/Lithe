@@ -1,5 +1,10 @@
 ﻿{
 	"version": 3,
+	"cmakeMinimumRequired": {
+		"major": 3,
+        "minor": 21,
+        "patch": 0
+	},
 	"configurePresets": [
 		{
 			"name": "windows-base",
@@ -23,8 +28,9 @@
 			"binaryDir": "${sourceDir}/out/build/${presetName}",
 			"installDir": "${sourceDir}/out/install/${presetName}",
 			"cacheVariables": {
-				"CMAKE_C_COMPILER": "/usr/bin/clang",
-				"CMAKE_CXX_COMPILER": "/usr/bin/clang++"
+				"CMAKE_C_COMPILER": "clang",
+				"CMAKE_CXX_COMPILER": "clang++",
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
 			},
 			"condition": {
 				"type": "equals",
@@ -38,8 +44,9 @@
 			"binaryDir": "${sourceDir}/out/build/${presetName}",
 			"installDir": "${sourceDir}/out/install/${presetName}",
 			"cacheVariables": {
-				"CMAKE_C_COMPILER": "/usr/bin/gcc",
-				"CMAKE_CXX_COMPILER": "/usr/bin/g++"
+				"CMAKE_C_COMPILER": "gcc",
+				"CMAKE_CXX_COMPILER": "g++",
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
 			},
 			"condition": {
 				"type": "equals",
