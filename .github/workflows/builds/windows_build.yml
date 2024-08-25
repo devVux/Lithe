@@ -1,5 +1,5 @@
 
-name: 'CMake Build Matrix'
+name: 'Windows CMake Build'
 on: push
 jobs:
   job:
