@@ -9,3 +9,5 @@ cmake-build-debug/
 /vcpkg-manifest-install.log
 /CMakeCache.txt
 /Sandbox/cmake_install.cmake
+/Lithe/cmake_install.cmake
+/build.ninja

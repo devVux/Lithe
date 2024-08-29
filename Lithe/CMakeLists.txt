@@ -3,6 +3,10 @@
 set(PROJECT_NAME "Lithe")
 project(${PROJECT_NAME})
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 find_package(spdlog REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
@@ -45,3 +49,24 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     box2d::box2d
 	LLGL::LLGL 
 )
+
+set(RENDERER_DLLS_NAMES
+    "LLGL_OpenGL"
+    "LLGL_Direct3D11"
+)
+
+foreach(RENDERER ${RENDERER_DLLS_NAMES})
+	if(CMAKE_BUILD_TYPE STREQUAL "Release")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/${RENDERER}.dll"
+			"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${RENDERER}.dll"
+		)
+	elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/debug/bin/${RENDERER}D.dll"
+			"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${RENDERER}D.dll"
+		)
+	endif()
+endforeach()
