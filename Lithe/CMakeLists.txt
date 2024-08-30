@@ -12,7 +12,6 @@ find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(Stb REQUIRED)
 find_package(box2d REQUIRED)
-find_package(LLGL REQUIRED)
 
 enable_testing()
 add_subdirectory("tests")
@@ -22,6 +21,10 @@ include_directories(
     "${PROJECT_SOURCE_DIR}/include"
     "${PROJECT_SOURCE_DIR}/include/Lithe"
     "${PROJECT_SOURCE_DIR}/include/Lithe/Core"
+)
+
+include_directories(
+    "${CMAKE_SOURCE_DIR}/vendor/llgl/include"
 )
 
 set(SOURCES
@@ -47,26 +50,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     glfw
     glm::glm
     box2d::box2d
-	LLGL::LLGL 
+	LLGL
 )
-
-set(RENDERER_DLLS_NAMES
-    "LLGL_OpenGL"
-    "LLGL_Direct3D11"
-)
-
-foreach(RENDERER ${RENDERER_DLLS_NAMES})
-	if(CMAKE_BUILD_TYPE STREQUAL "Release")
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			"${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/${RENDERER}.dll"
-			"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${RENDERER}.dll"
-		)
-	elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			"${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/debug/bin/${RENDERER}D.dll"
-			"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${RENDERER}D.dll"
-		)
-	endif()
-endforeach()

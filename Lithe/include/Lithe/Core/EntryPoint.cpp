@@ -4,6 +4,7 @@
 #include <LLGL/RenderSystem.h>
 #include <LLGL/LLGL.h>
 #include <LLGL/Window.h>
+#include <LLGL/WindowFlags.h>
 
 #define LLGL_BUILD_RENDERER_OPENGL
 
@@ -18,14 +19,13 @@ int main(int argc, char* argv[]) {
 		LLGL::WindowDescriptor windowDesc;
 		windowDesc.title = "LLGL Window";
 		windowDesc.size = { 720, 480 };
-		windowDesc.centered = true;
-		windowDesc.resizable = true;
-		windowDesc.visible = true;
+		windowDesc.flags = LLGL::WindowFlags::Visible | LLGL::WindowFlags::Centered | LLGL::WindowFlags::Resizable;
+	
 
 		auto window = LLGL::Window::Create(windowDesc);
-
-		while (window->ProcessEvents()) {
-
+		while (!window->HasQuit()) {
+			std::cout << " nigga\n";
+			window->ProcessEvents();
 	
 		}
 

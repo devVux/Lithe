@@ -5,3 +5,6 @@
 [submodule "vendor/vcpkg"]
 	path = vendor/vcpkg
 	url = https://github.com/microsoft/vcpkg.git
+[submodule "vendor/llgl"]
+	path = vendor/llgl
+	url = https://github.com/LukasBanana/LLGL.git

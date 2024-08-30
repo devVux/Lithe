@@ -15,3 +15,4 @@ include_directories("${CMAKE_SOURCE_DIR}/Lithe/include")
 
 add_subdirectory(Lithe)
 add_subdirectory(Sandbox)
+add_subdirectory(vendor/llgl)

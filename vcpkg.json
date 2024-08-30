@@ -1,16 +1,14 @@
 {
-	"dependencies": [
-		"entt",
-		"glfw3",
-		"glm",
-		"gtest",
-		"spdlog",
-		"stb",
-		"box2d",
-		{
-			"name": "llgl",
-			"features": [ "opengl", "direct3d11" ]
-		}
-	],
-	"builtin-baseline": "3508985146f1b1d248c67ead13f8f54be5b4f5da"
+    "name": "my-project",
+    "version": "1.0.0",
+    "dependencies": [
+        "entt",
+        "glfw3",
+        "glm",
+        "gtest",
+        "spdlog",
+        "stb",
+        "box2d"
+    ],
+    "builtin-baseline": "3508985146f1b1d248c67ead13f8f54be5b4f5da"
 }
