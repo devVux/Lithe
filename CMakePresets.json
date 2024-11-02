@@ -2,19 +2,21 @@
 	"version": 3,
 	"cmakeMinimumRequired": {
 		"major": 3,
-        "minor": 21,
-        "patch": 0
+		"minor": 21,
+		"patch": 0
 	},
 	"configurePresets": [
 		{
-			"name": "windows-base",
+			"name": "windows-debug",
 			"generator": "Ninja",
-			"binaryDir": "${sourceDir}/out/build/${presetName}",
-			"installDir": "${sourceDir}/out/install/${presetName}",
+			"binaryDir": "${sourceDir}/out/build/windows-debug",
+			"installDir": "${sourceDir}/out/install/windows-debug",
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "cl.exe",
 				"CMAKE_CXX_COMPILER": "cl.exe",
-				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"LLGL_BUILD_RENDERER_OPENGL": "ON",
+				"CMAKE_BUILD_TYPE": "Debug"
 			},
 			"condition": {
 				"type": "equals",
@@ -23,14 +25,37 @@
 			}
 		},
 		{
-			"name": "macos-base",
+			"name": "windows-release",
 			"generator": "Ninja",
-			"binaryDir": "${sourceDir}/out/build/${presetName}",
-			"installDir": "${sourceDir}/out/install/${presetName}",
+			"binaryDir": "${sourceDir}/out/build/windows-release",
+			"installDir": "${sourceDir}/out/install/windows-release",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "cl.exe",
+				"CMAKE_CXX_COMPILER": "cl.exe",
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"LLGL_BUILD_RENDERER_OPENGL": "ON",
+				"CMAKE_BUILD_TYPE": "Release"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "macos-debug",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/macos-debug",
+			"installDir": "${sourceDir}/out/install/macos-debug",
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "clang",
 				"CMAKE_CXX_COMPILER": "clang++",
-				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"LLGL_BUILD_RENDERER_METAL": "ON",
+				"CMAKE_BUILD_TYPE": "Debug",
+				"LLGL_ENABLE_DEBUG_LAYER": "ON",
+				"LLGL_DEBUG": "1",
+				"MTL_LANGUAGE_REVISION": "Metal20"
 			},
 			"condition": {
 				"type": "equals",
@@ -39,14 +64,50 @@
 			}
 		},
 		{
-			"name": "linux-base",
+			"name": "macos-release",
 			"generator": "Ninja",
-			"binaryDir": "${sourceDir}/out/build/${presetName}",
-			"installDir": "${sourceDir}/out/install/${presetName}",
+			"binaryDir": "${sourceDir}/out/build/macos-release",
+			"installDir": "${sourceDir}/out/install/macos-release",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "clang",
+				"CMAKE_CXX_COMPILER": "clang++",
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"LLGL_BUILD_RENDERER_METAL": "ON",
+				"CMAKE_BUILD_TYPE": "Release"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Darwin"
+			}
+		},
+		{
+			"name": "linux-debug",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/linux-debug",
+			"installDir": "${sourceDir}/out/install/linux-debug",
 			"cacheVariables": {
 				"CMAKE_C_COMPILER": "gcc",
 				"CMAKE_CXX_COMPILER": "g++",
-				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"CMAKE_BUILD_TYPE": "Debug"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "linux-release",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/linux-release",
+			"installDir": "${sourceDir}/out/install/linux-release",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "gcc",
+				"CMAKE_CXX_COMPILER": "g++",
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"CMAKE_BUILD_TYPE": "Release"
 			},
 			"condition": {
 				"type": "equals",
@@ -59,7 +120,7 @@
 		{
 			"name": "x64-debug",
 			"displayName": "x64 Debug",
-			"configurePreset": "windows-base",
+			"configurePreset": "windows-debug",
 			"configuration": "Debug",
 			"condition": {
 				"type": "equals",
@@ -70,7 +131,7 @@
 		{
 			"name": "x64-release",
 			"displayName": "x64 Release",
-			"configurePreset": "windows-base",
+			"configurePreset": "windows-release",
 			"configuration": "Release",
 			"condition": {
 				"type": "equals",
@@ -81,7 +142,7 @@
 		{
 			"name": "macos-debug",
 			"displayName": "macOS Debug",
-			"configurePreset": "macos-base",
+			"configurePreset": "macos-debug",
 			"configuration": "Debug",
 			"condition": {
 				"type": "equals",
@@ -92,7 +153,7 @@
 		{
 			"name": "macos-release",
 			"displayName": "macOS Release",
-			"configurePreset": "macos-base",
+			"configurePreset": "macos-release",
 			"configuration": "Release",
 			"condition": {
 				"type": "equals",
@@ -103,7 +164,7 @@
 		{
 			"name": "linux-debug",
 			"displayName": "Linux Debug",
-			"configurePreset": "linux-base",
+			"configurePreset": "linux-debug",
 			"configuration": "Debug",
 			"condition": {
 				"type": "equals",
@@ -114,7 +175,7 @@
 		{
 			"name": "linux-release",
 			"displayName": "Linux Release",
-			"configurePreset": "linux-base",
+			"configurePreset": "linux-release",
 			"configuration": "Release",
 			"condition": {
 				"type": "equals",
