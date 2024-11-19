@@ -1,22 +1,24 @@
-﻿cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required(VERSION 3.8)
 
-set(PROJECT_NAME "Sandbox")
-project(${PROJECT_NAME})
+project(Sandbox)
 
 set(SOURCES
-	"Sandbox.cpp"
+    "Sandbox.cpp"
 )
-
-include_directories("${CMAKE_SOURCE_DIR}/Lithe/include")
-
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} PRIVATE Lithe)
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 23)
+if(LITHE_RENDERER STREQUAL "Metal")
+    target_link_libraries(${PROJECT_NAME} PRIVATE LLGL_Metal)
+elseif(LITHE_RENDERER STREQUAL "OpenGL")
+    target_link_libraries(${PROJECT_NAME} PRIVATE LLGL_OpenGL)
+endif()
 
 add_custom_command(
-	TARGET ${PROJECT_NAME}
-	POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/compile_commands.json" "${CMAKE_SOURCE_DIR}/compile_commands.json"
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy 
+    "${CMAKE_BINARY_DIR}/compile_commands.json" 
+    "${CMAKE_SOURCE_DIR}/compile_commands.json"
 )

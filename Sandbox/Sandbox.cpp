@@ -1,6 +1,4 @@
-#include <iostream>
-
-#include <Lithe/Core/EntryPoint.h>
+#include <Lithe/Lithe.h>
 
 class Sandbox: public Lithe::Application {
 
@@ -10,7 +8,7 @@ class Sandbox: public Lithe::Application {
 			std::cout << "Sandbox created\n";
 		}
 
-		~Sandbox() {
+		virtual ~Sandbox() override {
 			std::cout << "Sandbox destroyed\n";
 		}
 	

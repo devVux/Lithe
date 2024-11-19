@@ -1,5 +1,5 @@
 #pragma once
-#include <iostream>
+#include "Renderer.h"
 
 namespace Lithe {
 
@@ -15,6 +15,13 @@ namespace Lithe {
 				std::cout << "Application destroyed\n";
 			}
 
+			void init();
+
+			void run();
+
+		private:
+
+			Renderer mRenderer;
 
 	};
 	
