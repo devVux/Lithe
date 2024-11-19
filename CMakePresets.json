@@ -46,14 +46,10 @@
 			"binaryDir": "${sourceDir}/out/build/macos-debug",
 			"installDir": "${sourceDir}/out/install/macos-debug",
 			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
 				"CMAKE_C_COMPILER": "clang",
 				"CMAKE_CXX_COMPILER": "clang++",
-				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
-				"LLGL_BUILD_RENDERER_METAL": "ON",
-				"CMAKE_BUILD_TYPE": "Debug",
-				"LLGL_ENABLE_DEBUG_LAYER": "ON",
-				"LLGL_DEBUG": "1",
-				"MTL_LANGUAGE_REVISION": "Metal20"
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
 			},
 			"condition": {
 				"type": "equals",
@@ -67,11 +63,10 @@
 			"binaryDir": "${sourceDir}/out/build/macos-release",
 			"installDir": "${sourceDir}/out/install/macos-release",
 			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
 				"CMAKE_C_COMPILER": "clang",
 				"CMAKE_CXX_COMPILER": "clang++",
-				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
-				"LLGL_BUILD_RENDERER_METAL": "ON",
-				"CMAKE_BUILD_TYPE": "Release"
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
 			},
 			"condition": {
 				"type": "equals",

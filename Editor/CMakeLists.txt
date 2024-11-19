@@ -8,10 +8,7 @@ set(SOURCES
 )
 
 include_directories(
-    "${PROJECT_SOURCE_DIR}/vendor/imgui"
-    "${PROJECT_SOURCE_DIR}/include"
-    "${PROJECT_SOURCE_DIR}/include/Lithe"
-    "${PROJECT_SOURCE_DIR}/include/Lithe/Core"
+    "${CMAKE_SOURCE_DIR}/vendor/imgui"
 )
 
 set(IMGUI_SOURCES
@@ -24,5 +21,5 @@ set(IMGUI_SOURCES
     "${CMAKE_SOURCE_DIR}/vendor/imgui/backends/imgui_impl_glfw.cpp"
 )
 
-add_executable(${PROJECT_NAME} main.cpp ${IMGUI_SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES})
 target_link_libraries(${PROJECT_NAME} PRIVATE Lithe)

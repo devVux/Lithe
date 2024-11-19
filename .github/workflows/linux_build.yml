@@ -36,5 +36,5 @@ jobs:
         uses: lukka/run-cmake@v10
         id: runcmake
         with:
-          configurePreset: 'linux-base'
+          configurePreset: 'linux-release'
           buildPreset: 'linux-release'

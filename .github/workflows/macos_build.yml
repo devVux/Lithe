@@ -31,5 +31,5 @@ jobs:
         uses: lukka/run-cmake@v10
         id: runcmake
         with:
-          configurePreset: 'macos-base'
+          configurePreset: 'macos-release'
           buildPreset: 'macos-release'

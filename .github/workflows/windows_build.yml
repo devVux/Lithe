@@ -36,5 +36,5 @@ jobs:
         uses: lukka/run-cmake@v10
         id: runcmake
         with:
-          configurePreset: 'windows-base'
+          configurePreset: 'windows-release'
           buildPreset: 'x64-release'
