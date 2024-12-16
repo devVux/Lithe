@@ -49,20 +49,28 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 )
 
 if(APPLE)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC 
-		FRAGMENT_ENTRY_POINT=\"\"
-		FRAGMENT_PROFILE=\"\"
+    target_compile_definitions(${PROJECT_NAME} PUBLIC 
+        FRAGMENT_ENTRY_POINT=\"\"
+        FRAGMENT_PROFILE=\"\"
 
-		GLFW_EXPOSE_NATIVE_COCOA
-	)
-elseif()
-	target_compile_definitions(${PROJECT_NAME} PUBLIC 
-		FRAGMENT_ENTRY_POINT=\"\"
-		FRAGMENT_PROFILE=\"\"
+        GLFW_EXPOSE_NATIVE_COCOA
+    )
+elseif(WIN32)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC 
+        FRAGMENT_ENTRY_POINT=\"\"
+        FRAGMENT_PROFILE=\"\"
 
-		GLFW_EXPOSE_NATIVE_WIN32
-	)
+        GLFW_EXPOSE_NATIVE_WIN32
+    )
+elseif(UNIX)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC 
+        FRAGMENT_ENTRY_POINT=\"\"
+        FRAGMENT_PROFILE=\"\"
+
+        GLFW_EXPOSE_NATIVE_X11
+    )
 endif()
+
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
