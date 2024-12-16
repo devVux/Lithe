@@ -3,6 +3,8 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/pattern_formatter.h>
 
+#include <iostream>
+
 namespace Lithe {
 	class Logger {
 		public:
@@ -43,7 +45,7 @@ namespace Lithe {
 		}
 
 		template <typename... Args>
-		inline void ERROR(spdlog::format_string_t<Args...> fmt, Args&&... args) {
+		inline void ERR(spdlog::format_string_t<Args...> fmt, Args&&... args) {
 			Logger::getCoreLogger()->error(fmt, std::forward<Args>(args)...);
 		}
 

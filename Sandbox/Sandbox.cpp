@@ -4,7 +4,7 @@ class Sandbox: public Lithe::Application {
 
 	public:
 
-		Sandbox() {
+		Sandbox(std::shared_ptr<Lithe::EventDispatcher> dispatcher): Application(dispatcher) {
 			std::cout << "Sandbox created\n";
 		}
 
@@ -14,6 +14,6 @@ class Sandbox: public Lithe::Application {
 	
 };
 
-Lithe::Application* Lithe::create() {
-	return new Sandbox;
+Lithe::Application* Lithe::create(std::shared_ptr<Lithe::EventDispatcher> dispatcher) {
+	return new Sandbox(dispatcher);
 }

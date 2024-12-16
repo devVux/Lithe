@@ -6,7 +6,11 @@ set(SOURCES
     "include/Lithe/Core/EntryPoint.cpp"
     "include/Lithe/Core/Application.cpp"
     "include/Lithe/Core/Renderer.cpp"
-)
+
+    #"include/Lithe/Scene/OrthographicCamera.cpp"
+    #"include/Lithe/Scene/PerspectiveCamera.cpp"
+    
+  "include/Lithe/Core/Window.cpp")
 
 include_directories(
     "${PROJECT_SOURCE_DIR}/include"
@@ -33,7 +37,34 @@ endif()
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/llgl ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC MODULE_NAME=\"${LITHE_RENDERER}\")
+target_compile_definitions(${PROJECT_NAME} PUBLIC 
+	MODULE_NAME=\"${LITHE_RENDERER}\"
+	ASSETS_DIR=\"${CMAKE_SOURCE_DIR}/assets\"
+	SHADERS_DIR=\"${PROJECT_SOURCE_DIR}/assets/shaders/\"
+
+	VERTEX_ENTRY_POINT=\"\"
+	VERTEX_PROFILE=\"\"
+	FRAGMENT_ENTRY_POINT=\"\"
+	FRAGMENT_PROFILE=\"\"
+)
+
+if(APPLE)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC 
+		FRAGMENT_ENTRY_POINT=\"\"
+		FRAGMENT_PROFILE=\"\"
+
+		GLFW_EXPOSE_NATIVE_COCOA
+	)
+elseif()
+	target_compile_definitions(${PROJECT_NAME} PUBLIC 
+		FRAGMENT_ENTRY_POINT=\"\"
+		FRAGMENT_PROFILE=\"\"
+
+		GLFW_EXPOSE_NATIVE_WIN32
+	)
+endif()
+
+
 target_link_libraries(${PROJECT_NAME} PUBLIC
     spdlog::spdlog
     glfw
