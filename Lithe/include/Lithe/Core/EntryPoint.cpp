@@ -7,8 +7,8 @@ int main() {
 	using namespace Lithe;
 	Logger::init("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
 
-	auto dispatcher = std::make_shared<EventDispatcher>();
-	EventBus bus(*dispatcher);
+	EventDispatcher dispatcher;
+	EventBus bus(dispatcher);
 
 
 	Application* application = Lithe::create(dispatcher);
