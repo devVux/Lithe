@@ -41,7 +41,6 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 	MODULE_NAME=\"${LITHE_RENDERER}\"
 	ASSETS_DIR=\"${CMAKE_SOURCE_DIR}/assets\"
 	SHADERS_DIR=\"${PROJECT_SOURCE_DIR}/assets/shaders/\"
-
 )
 
 if(APPLE)
@@ -66,7 +65,7 @@ if(APPLE)
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ObjC++")
 
-elseif()
+elseif(WIN32)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC
 		VERTEX_ENTRY_POINT=\"\"
 		VERTEX_PROFILE=\"\"
@@ -74,6 +73,15 @@ elseif()
 		FRAGMENT_PROFILE=\"\"
 
 		GLFW_EXPOSE_NATIVE_WIN32
+	)
+else()
+	target_compile_definitions(${PROJECT_NAME} PUBLIC
+		VERTEX_ENTRY_POINT=\"\"
+		VERTEX_PROFILE=\"\"
+		FRAGMENT_ENTRY_POINT=\"\"
+		FRAGMENT_PROFILE=\"\"
+
+		GLFW_EXPOSE_NATIVE_X11
 	)
 endif()
 
