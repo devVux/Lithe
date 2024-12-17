@@ -55,7 +55,13 @@ namespace Lithe {
 			LLGL::ShaderDescriptor vertexDesc;
 			vertexDesc.type = LLGL::ShaderType::Vertex;
 			vertexDesc.sourceType = LLGL::ShaderSourceType::CodeFile;
-			vertexDesc.source = SHADERS_DIR"default.vert";
+
+#if (__APPLE__)
+			vertexDesc.source = SHADERS_DIR"default.msl.vert";
+#else
+			vertexDesc.source = SHADERS_DIR"default.glsl.vert";
+#endif
+
 			vertexDesc.entryPoint = VERTEX_ENTRY_POINT;
 			vertexDesc.profile = VERTEX_PROFILE;
 			vertexDesc.vertex.inputAttribs = vertexFormat.attributes;
@@ -64,7 +70,13 @@ namespace Lithe {
 			LLGL::ShaderDescriptor fragmentDesc;
 			fragmentDesc.type = LLGL::ShaderType::Fragment;
 			fragmentDesc.sourceType = LLGL::ShaderSourceType::CodeFile;
-			fragmentDesc.source = SHADERS_DIR"default.frag";
+
+			#if (__APPLE__)
+				fragmentDesc.source = SHADERS_DIR"default.msl.frag";
+			#else
+				fragmentDesc.source = SHADERS_DIR"default.glsl.frag";
+			#endif
+
 			fragmentDesc.entryPoint = FRAGMENT_ENTRY_POINT;
 			fragmentDesc.profile = FRAGMENT_PROFILE;
 			fragmentShader = pRenderer->CreateShader(fragmentDesc);

@@ -2,11 +2,12 @@
 
 #include <Lithe/Core/Log.h>
 
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-
 #include <LLGL/Platform/NativeHandle.h>
 #include <Events/Event.h>
+
+
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 
 namespace Lithe {
 
@@ -84,7 +85,7 @@ namespace Lithe {
 			auto* handle = reinterpret_cast<LLGL::NativeHandle*>(nativeHandle);
 			
 			#if defined(__APPLE__)
-				handle->window = glfwGetCocoaWindow(pWindow);
+				handle->responder = glfwGetCocoaWindow(pWindow);
 			#elif defined(_WIN32)
 				handle->window = glfwGetWin32Window(pWindow);
 			#elif defined(__linux__)

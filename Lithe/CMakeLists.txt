@@ -10,7 +10,7 @@ set(SOURCES
     #"include/Lithe/Scene/OrthographicCamera.cpp"
     #"include/Lithe/Scene/PerspectiveCamera.cpp"
     
-  "include/Lithe/Core/Window.cpp")
+  "include/Lithe/Core/Window.mm")
 
 include_directories(
     "${PROJECT_SOURCE_DIR}/include"
@@ -42,35 +42,40 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 	ASSETS_DIR=\"${CMAKE_SOURCE_DIR}/assets\"
 	SHADERS_DIR=\"${PROJECT_SOURCE_DIR}/assets/shaders/\"
 
-	VERTEX_ENTRY_POINT=\"\"
-	VERTEX_PROFILE=\"\"
-	FRAGMENT_ENTRY_POINT=\"\"
-	FRAGMENT_PROFILE=\"\"
 )
 
 if(APPLE)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC 
-        FRAGMENT_ENTRY_POINT=\"\"
-        FRAGMENT_PROFILE=\"\"
+	find_library(COCOA Cocoa)
+	find_library(QUARTZCORE QuartzCore)
+	find_library(METAL Metal)
 
-        GLFW_EXPOSE_NATIVE_COCOA
-    )
-elseif(WIN32)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC 
-        FRAGMENT_ENTRY_POINT=\"\"
-        FRAGMENT_PROFILE=\"\"
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		${COCOA}
+		${QUARTZCORE}
+		${METAL}
+	)
 
-        GLFW_EXPOSE_NATIVE_WIN32
-    )
-elseif(UNIX)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC 
-        FRAGMENT_ENTRY_POINT=\"\"
-        FRAGMENT_PROFILE=\"\"
+	target_compile_definitions(${PROJECT_NAME} PUBLIC
+		VERTEX_ENTRY_POINT="vertex_shader"
+		VERTEX_PROFILE="1.1"
+		FRAGMENT_ENTRY_POINT="fragment_shader"
+		FRAGMENT_PROFILE="1.1"
 
-        GLFW_EXPOSE_NATIVE_X11
-    )
+		GLFW_EXPOSE_NATIVE_COCOA
+	)
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ObjC++")
+
+elseif()
+	target_compile_definitions(${PROJECT_NAME} PUBLIC
+		VERTEX_ENTRY_POINT=\"\"
+		VERTEX_PROFILE=\"\"
+		FRAGMENT_ENTRY_POINT=\"\"
+		FRAGMENT_PROFILE=\"\"
+
+		GLFW_EXPOSE_NATIVE_WIN32
+	)
 endif()
-
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
@@ -80,6 +85,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     box2d::box2d
     LLGL
 )
+
 
 enable_testing()
 add_subdirectory("tests")
