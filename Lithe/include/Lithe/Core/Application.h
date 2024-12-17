@@ -10,7 +10,7 @@ namespace Lithe {
 
 		public:
 
-			Application(EventDispatcher& dispatcher): mDispatcher(dispatcher) {
+			Application(std::shared_ptr<EventDispatcher> dispatcher): pDispatcher(dispatcher) {
 				std::cout << "Application created\n";
 			}
 			
@@ -31,13 +31,13 @@ namespace Lithe {
 			Renderer mRenderer; 
 			std::shared_ptr<Window> pWindow { nullptr };
 
-			EventDispatcher& mDispatcher;
+			std::shared_ptr<EventDispatcher> pDispatcher;
 
 			bool mRunning { false };
 
 	};
 	
 
-	extern Application* create(EventDispatcher&);
+	extern Application* create(std::shared_ptr<EventDispatcher>);
 
 }

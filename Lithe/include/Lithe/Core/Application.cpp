@@ -18,17 +18,17 @@ namespace Lithe {
 		if (!glfwInit())
 			Lithe::Log::ERR("Could not load GLFW");
 
-		pWindow = makeShared<Lithe::Window>(mDispatcher, LLGL::Extent2D(1200, 800), "Main window");
+		pWindow = makeShared<Lithe::Window>(pDispatcher, LLGL::Extent2D(1200, 800), "Main window");
 		mRenderer.init(pWindow, rendererDesc);
 
 		Input::setInput(pWindow.get());
 
-		mDispatcher.subscribe<WindowEvents::WindowCloseEvent>([this](const WindowEvents::WindowCloseEvent& e) {
+		pDispatcher->subscribe<WindowEvents::WindowCloseEvent>([this](const WindowEvents::WindowCloseEvent& e) {
 			stop();
 		});
 		
 		
-		mDispatcher.subscribe<MouseEvents::MouseButtonPressedEvent>([this](const MouseEvents::MouseButtonPressedEvent& e) {
+		pDispatcher->subscribe<MouseEvents::MouseButtonPressedEvent>([this](const MouseEvents::MouseButtonPressedEvent& e) {
 			Lithe::Log::TRACE("{}", Input::isKeyDown(Keys::A));
 		});
 		

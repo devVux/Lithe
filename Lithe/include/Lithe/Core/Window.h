@@ -12,8 +12,8 @@ namespace Lithe {
 		
 		public:
 
-			Window(EventDispatcher& dispatcher, const LLGL::Extent2D& size, const char* title):
-				pWindow(CreateGLFWWindow()), mTitle(title), mSize(size), mDispatcher(dispatcher) {
+			Window(std::shared_ptr<EventDispatcher> dispatcher, const LLGL::Extent2D& size, const char* title):
+				pWindow(CreateGLFWWindow()), mTitle(title), mSize(size), pDispatcher(dispatcher) {
 				init(dispatcher);
 			}
 			virtual ~Window();
@@ -29,7 +29,7 @@ namespace Lithe {
 
 		private:
 
-			void init(EventDispatcher& dispatcher);
+			void init(std::shared_ptr<EventDispatcher> dispatcher);
 
 			GLFWwindow* CreateGLFWWindow();
 
@@ -40,7 +40,7 @@ namespace Lithe {
 			std::string mTitle;
 
 			GLFWwindow* pWindow { nullptr };
-			EventDispatcher& mDispatcher;
+			std::shared_ptr<EventDispatcher> pDispatcher;
 
 
 	};

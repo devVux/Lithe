@@ -64,8 +64,8 @@ namespace Lithe {
 
 
 
-	void Window::init(EventDispatcher& dispatcher) {
-		glfwSetWindowUserPointer(pWindow, reinterpret_cast<void*>(&dispatcher));
+	void Window::init(std::shared_ptr<EventDispatcher> dispatcher) {
+		glfwSetWindowUserPointer(pWindow, reinterpret_cast<void*>(dispatcher.get()));
 
 		glfwSetKeyCallback(pWindow, onKeyCallback);
 		glfwSetMouseButtonCallback(pWindow, onMouseButtonCallback);
