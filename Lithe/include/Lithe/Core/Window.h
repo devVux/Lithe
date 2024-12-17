@@ -25,6 +25,7 @@ namespace Lithe {
 			virtual LLGL::Display* FindResidentDisplay() const override { return LLGL::Display::GetPrimary(); }
 			LLGL::Extent2D GetContentSize() const override { return mSize; }
 
+			void* native() const { return pWindow; }
 
 		private:
 

@@ -3,6 +3,7 @@
 
 #include "Lithe/Core/Log.h"
 #include "Lithe/Events/Event.h"
+#include "Lithe/Events/Input.h"
 
 #include <GLFW/glfw3.h>
 #include <Utils/Utils.h>
@@ -20,15 +21,15 @@ namespace Lithe {
 		pWindow = makeShared<Lithe::Window>(pDispatcher, LLGL::Extent2D(1200, 800), "Main window");
 		mRenderer.init(pWindow, rendererDesc);
 
-
+		Input::setInput(pWindow.get());
 
 		pDispatcher->subscribe<WindowEvents::WindowCloseEvent>([this](const WindowEvents::WindowCloseEvent& e) {
 			stop();
 		});
 		
-
+		
 		pDispatcher->subscribe<MouseEvents::MouseButtonPressedEvent>([this](const MouseEvents::MouseButtonPressedEvent& e) {
-			Lithe::Log::TRACE("{}", e.button);
+			Lithe::Log::TRACE("{}", Input::isKeyDown(Keys::A));
 		});
 		
 	}
