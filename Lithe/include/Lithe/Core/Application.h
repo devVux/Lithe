@@ -4,6 +4,9 @@
 #include "Lithe/Core/Window.h"
 #include "Lithe/Events/EventDispatcher.h"
 
+#include "Lithe/Scene/Scene.h"
+
+
 namespace Lithe {
 
 	class Application {
@@ -32,6 +35,8 @@ namespace Lithe {
 			std::shared_ptr<Window> pWindow { nullptr };
 
 			EventDispatcher& mDispatcher;
+
+			SceneManager mSceneManager;
 
 			bool mRunning { false };
 

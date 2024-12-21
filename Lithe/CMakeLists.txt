@@ -7,8 +7,7 @@ set(SOURCES
     "include/Lithe/Core/Application.cpp"
     "include/Lithe/Core/Renderer.cpp"
 
-    #"include/Lithe/Scene/OrthographicCamera.cpp"
-    #"include/Lithe/Scene/PerspectiveCamera.cpp"
+    "include/Lithe/Scene/Scene.cpp"
     
   "include/Lithe/Core/Window.mm")
 

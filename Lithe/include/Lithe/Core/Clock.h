@@ -17,7 +17,8 @@ namespace Lithe {
 				using TimePoint = ClockType::time_point;
 				using Duration = std::chrono::duration<Timestep>;
 
-				Clock(uint32_t n = 10): mStart(ClockType::now()), mLastUpdate(mStart), mTickInterval(Duration(1.0 / n > 0 ? 1.0 / n : 1.0)) { }
+				// @param tickInterval: updates per second
+				Clock(uint32_t tickInterval = 10): mStart(ClockType::now()), mLastUpdate(mStart), mTickInterval(Duration(1.0 / tickInterval > 0 ? 1.0 / tickInterval : 1.0)) { }
 				
 				// Set the tick interval in seconds
 				void setTickInterval(Timestep interval) {
