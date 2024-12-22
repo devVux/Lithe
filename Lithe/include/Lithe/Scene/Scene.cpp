@@ -3,9 +3,10 @@
 
 namespace Lithe {
 
-	void Scene::update(Time::Timestep ts) const {
+	void Scene::update(const Time::Timestep ts) const {
 		
-		Log::TRACE("updating scene {}s", ts);
+		if (pActiveCamera)
+			pActiveCamera->update(ts);
 
 	}
 

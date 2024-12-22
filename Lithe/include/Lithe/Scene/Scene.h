@@ -3,6 +3,7 @@
 #include "Lithe/Core/Log.h"
 #include "Lithe/Core/Clock.h"
 #include "Lithe/Scene/Entity.h"
+#include "Lithe/Scene/Camera.h"
 
 #include <memory>
 
@@ -12,7 +13,7 @@ namespace Lithe {
 
 		public:
 
-			void update(Time::Timestep ts) const;
+			void update(const Time::Timestep ts) const;
 
 			std::shared_ptr<Entity> createEntity() {
 				std::shared_ptr<Entity> e = std::make_shared<Entity>(mRegistry, mRegistry.create());
@@ -26,7 +27,20 @@ namespace Lithe {
 			}
 
 
+			void add(std::shared_ptr<Camera> camera) {
+				if (camera) {
+					mCameras.push_back(camera);
+					pActiveCamera = camera;
+				}
+			}
+
+			std::shared_ptr<Camera> camera() const { return pActiveCamera; }
+
 		private:
+
+			std::vector<std::shared_ptr<Camera>> mCameras;
+			std::shared_ptr<Camera> pActiveCamera { nullptr };
+
 
 			std::vector<std::shared_ptr<Entity>> mEntities;
 			entt::registry mRegistry;
@@ -78,6 +92,7 @@ namespace Lithe {
 
 			ScenePtr active() const { return pActiveScene; }
 
+			std::shared_ptr<Camera> activeCamera() const { return pActiveScene == nullptr ? nullptr : pActiveScene->camera(); }
 
 		private:
 

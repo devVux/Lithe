@@ -7,6 +7,8 @@
 #include <LLGL/Window.h>
 #include <LLGL/Utils/VertexFormat.h>
 
+#include <glm/ext.hpp>
+
 namespace Lithe {
 
 	namespace Misc {
@@ -49,7 +51,7 @@ namespace Lithe {
 			bufferDesc.size = sizeof(vertices);
 			bufferDesc.bindFlags = LLGL::BindFlags::VertexBuffer;
 			bufferDesc.vertexAttribs = vertexFormat.attributes;
-			vertexBuffer = pRenderer->CreateBuffer(bufferDesc, vertices);
+			pVertexBuffer = pRenderer->CreateBuffer(bufferDesc, vertices);
 		
 
 			LLGL::ShaderDescriptor vertexDesc;
@@ -111,24 +113,59 @@ namespace Lithe {
 			pCommands = pRenderer->CreateCommandBuffer();
 		}
 
+
+		{
+			LLGL::BufferDescriptor bufferDesc;
+			bufferDesc.size = sizeof(glm::mat4);
+			bufferDesc.bindFlags = LLGL::BindFlags::ConstantBuffer;
+			bufferDesc.cpuAccessFlags = LLGL::CPUAccessFlags::Write;
+			pCameraBuffer = pRenderer->CreateBuffer(bufferDesc);
+		}
+
+
+		{
+			LLGL::PipelineLayoutDescriptor layoutDesc;
+			layoutDesc.heapBindings = {
+				LLGL::BindingDescriptor{ "cameraBuffer", LLGL::ResourceType::Buffer, LLGL::BindFlags::ConstantBuffer, LLGL::StageFlags::VertexStage, 0 },
+			};
+			layoutDesc.uniforms = {
+				LLGL::UniformDescriptor{ "uViewProjection", LLGL::UniformType::Float4x4 }
+			};
+
+			auto pipelineLayout = pRenderer->CreatePipelineLayout(layoutDesc);
+
+			LLGL::ResourceViewDescriptor resourceViews[] = { pCameraBuffer };
+			pResourceHeap = pRenderer->CreateResourceHeap(pipelineLayout, resourceViews);
+		}
+
+
 	}
 
-	void Renderer::draw() {
-		
+	void Renderer::draw(const Lithe::Camera* camera) {
+		if (!camera) {
+			Log::WARN("No active camera; skipping rendering");
+			return;
+		}
+
+		pRenderer->WriteBuffer(*pCameraBuffer, 0, glm::value_ptr(camera->viewProjection()), sizeof(camera->viewProjection()));
+
 		pCommands->Begin();
 		pCommands->SetViewport(pSwapChain->GetResolution());
 		pCommands->BeginRenderPass(*pSwapChain);
 		{
 			pCommands->Clear(LLGL::ClearFlags::Color, { 0.1f, 0.1f, 0.1f, 1.0f });
 			pCommands->SetPipelineState(*pPipeline);
-			pCommands->SetVertexBuffer(*vertexBuffer);
+
+			pCommands->SetResourceHeap(*pResourceHeap);
+
+			pCommands->SetVertexBuffer(*pVertexBuffer);
 			pCommands->Draw(3, 0);
 		}
 		pCommands->EndRenderPass();
 		pCommands->End();
 		pCommandQueue->Submit(*pCommands);
 		pSwapChain->Present();
-
+	
 	}
 
 

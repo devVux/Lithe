@@ -6,6 +6,8 @@
 #include "Lithe/Events/Event.h"
 #include "Lithe/Events/Input.h"
 
+#include "Lithe/Scene/OrthographicCamera.h"
+
 #include <GLFW/glfw3.h>
 #include <Utils/Utils.h>
 
@@ -24,17 +26,15 @@ namespace Lithe {
 
 		Input::setInput(pWindow.get());
 
-		{
-			mDispatcher.subscribe<WindowEvents::WindowCloseEvent>([this](const WindowEvents::WindowCloseEvent& e) {
-				stop();
-			});
-			mDispatcher.subscribe<MouseEvents::MouseButtonPressedEvent>([this](const MouseEvents::MouseButtonPressedEvent& e) {
-				Lithe::Log::TRACE("{}", Input::isKeyDown(Keys::A));
-			});
-		}
+		
+		mDispatcher.subscribe<WindowEvents::WindowCloseEvent>([this](const WindowEvents::WindowCloseEvent& e) {
+			stop();
+		});
 
 
-		mSceneManager.create("intro");
+		auto scene = mSceneManager.create("intro");
+		scene->add(std::make_shared<OrthographicCamera>());
+
 
 	}
 
@@ -42,15 +42,13 @@ namespace Lithe {
 		
 		Time::Clock clock;
 		
-
 		mRunning = true;
 		while (mRunning) {
+			Time::Timestep ts = clock.timeSinceLastUpdate();
 
-			mRenderer.draw();
+			mSceneManager.update(ts);
 
-			Time::Timestep delta = clock.timeSinceLastUpdate();
-
-			mSceneManager.update(delta);
+			mRenderer.draw(mSceneManager.activeCamera().get());
 
 			pWindow->ProcessEvents();
 		}

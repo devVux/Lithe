@@ -6,10 +6,14 @@ set(SOURCES
     "include/Lithe/Core/EntryPoint.cpp"
     "include/Lithe/Core/Application.cpp"
     "include/Lithe/Core/Renderer.cpp"
+	"include/Lithe/Core/Window.mm"
 
     "include/Lithe/Scene/Scene.cpp"
+    "include/Lithe/Scene/OrthographicCamera.cpp"
+    "include/Lithe/Scene/PerspectiveCamera.cpp"
     
-  "include/Lithe/Core/Window.mm")
+
+)
 
 include_directories(
     "${PROJECT_SOURCE_DIR}/include"
