@@ -7,8 +7,8 @@
 #include "Lithe/Events/Input.h"
 
 #include "Lithe/Scene/OrthographicCamera.h"
+#include "Lithe/Scene/Components.h"
 
-#include <GLFW/glfw3.h>
 #include <Utils/Utils.h>
 
 
@@ -33,8 +33,11 @@ namespace Lithe {
 
 
 		auto scene = mSceneManager.create("intro");
-		scene->add(std::make_shared<OrthographicCamera>());
+		scene->addCamera(std::make_shared<OrthographicCamera>());
 
+		auto e = scene->createEntity();
+		e->addComponent<TransformComponent>(glm::mat4(1.0f));
+		e->addComponent<SpriteComponent>(glm::vec4(0.6f, 1.0f, 0.6f, 1.0f));
 
 	}
 
@@ -48,7 +51,7 @@ namespace Lithe {
 
 			mSceneManager.update(ts);
 
-			mRenderer.draw(mSceneManager.activeCamera().get());
+			mRenderer.draw(*mSceneManager.active(), mSceneManager.activeCamera().get());
 
 			pWindow->ProcessEvents();
 		}

@@ -14,6 +14,14 @@ class Entity {
 			mHandle.emplace<T>(std::forward<Args>(args)...);
 		}
 
+		template <class T, class... Args>
+		T& getOrCreate(Args&&... args) {
+			if (auto* component = mHandle.try_get<T>())
+				return *component;
+
+			return mHandle.emplace<T>(std::forward<Args>(args)...);
+		}
+
 		template <class T>
 		bool hasComponent() {
 			return mHandle.try_get<T>();

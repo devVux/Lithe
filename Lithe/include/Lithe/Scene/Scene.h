@@ -27,7 +27,7 @@ namespace Lithe {
 			}
 
 
-			void add(std::shared_ptr<Camera> camera) {
+			void addCamera(std::shared_ptr<Camera> camera) {
 				if (camera) {
 					mCameras.push_back(camera);
 					pActiveCamera = camera;
@@ -35,6 +35,12 @@ namespace Lithe {
 			}
 
 			std::shared_ptr<Camera> camera() const { return pActiveCamera; }
+
+			
+			auto begin() { return mEntities.begin(); }
+			auto end() { return mEntities.end(); }
+			auto begin() const { return mEntities.begin(); }
+			auto end() const { return mEntities.end(); }
 
 		private:
 
