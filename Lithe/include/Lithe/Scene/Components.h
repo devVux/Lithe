@@ -7,6 +7,15 @@ struct MeshComponent {
 	glm::vec2 vertices[4];
 };
 
+struct RenderableComponent {
+	bool visible;
+	glm::vec3 position;
+	glm::vec3 size;
+
+	RenderableComponent(const glm::vec3& p = glm::vec3(0.0f), const glm::vec3& s = glm::vec3(1.0f), bool v = true): visible(v), position(p), size(s) { }
+
+};
+
 struct TransformComponent {
 
 	glm::mat4 transform;

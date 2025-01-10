@@ -11,6 +11,8 @@
 
 #include <Utils/Utils.h>
 
+#include <glm/ext/matrix_transform.hpp>
+
 
 namespace Lithe {
 
@@ -36,8 +38,14 @@ namespace Lithe {
 		scene->addCamera(std::make_shared<OrthographicCamera>());
 
 		auto e = scene->createEntity();
+		e->addComponent<RenderableComponent>(glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(2.0f));
 		e->addComponent<TransformComponent>(glm::mat4(1.0f));
 		e->addComponent<SpriteComponent>(glm::vec4(0.6f, 1.0f, 0.6f, 1.0f));
+		
+		auto e2 = scene->createEntity();
+		e2->addComponent<RenderableComponent>(glm::vec3(-5.0f, 1.0f, 0.0f), glm::vec3(1.0f));
+		e2->addComponent<TransformComponent>(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 3.0f, 1.0f)));
+		//e2->addComponent<SpriteComponent>(glm::vec4(0.2f, 0.4f, 0.6f, 1.0f));
 
 	}
 

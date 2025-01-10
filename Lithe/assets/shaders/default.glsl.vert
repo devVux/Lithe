@@ -1,6 +1,6 @@
 #version 420 core
 
-layout(location = 0) in vec2 position;
+layout(location = 0) in vec3 position;
 
 layout(std140, binding = 0) uniform CameraBuffer {
     mat4 uViewProjection;
@@ -17,5 +17,5 @@ void main() {
     vColor = uColors[gl_InstanceID];
 
     mat4 model = uTransforms[gl_InstanceID];
-    gl_Position = uViewProjection * model * vec4(position, 0.0, 1.0);
+    gl_Position = uViewProjection * model * vec4(position, 1.0);
 }

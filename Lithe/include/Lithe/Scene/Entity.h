@@ -23,7 +23,12 @@ class Entity {
 		}
 
 		template <class T>
-		bool hasComponent() {
+		T& get() {
+			return mHandle.get<T>();
+		}
+
+		template <class T>
+		bool has() {
 			return mHandle.try_get<T>();
 		}
 

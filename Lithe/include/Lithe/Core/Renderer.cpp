@@ -15,17 +15,8 @@ namespace Lithe {
 
 #define MAX_VERTICES 100
 
-	namespace Misc {
-		struct Vertex {
-			float position[2];
-		};
 
-	}
-	constexpr static Misc::Vertex vertices[3] = {
-		{ {  0.0f,   0.8f } },
-		{ { -0.8f,  -0.8f } },
-		{ {  0.8f,  -0.8f } }
-	};
+
 
 	void Renderer::init(SharedPtr<LLGL::Surface> surface, const LLGL::RenderSystemDescriptor& descriptor) {
 		{
@@ -46,10 +37,10 @@ namespace Lithe {
 		{
 				
 			LLGL::VertexFormat vertexFormat;
-			vertexFormat.AppendAttribute({ "position", LLGL::Format::RG32Float });
+			vertexFormat.AppendAttribute({ "position", LLGL::Format::RGB32Float });
 
 			LLGL::BufferDescriptor bufferDesc;
-			bufferDesc.size = sizeof(Misc::Vertex) * MAX_VERTICES;
+			bufferDesc.size = sizeof(RenderSystem::Vertex) * MAX_VERTICES * 4;
 			bufferDesc.bindFlags = LLGL::BindFlags::VertexBuffer;
 			bufferDesc.vertexAttribs = vertexFormat.attributes;
 			bufferDesc.cpuAccessFlags = LLGL::CPUAccessFlags::Write;
@@ -98,7 +89,7 @@ namespace Lithe {
 			LLGL::GraphicsPipelineDescriptor pipelineDesc;
 			pipelineDesc.vertexShader = vertexShader;
 			pipelineDesc.fragmentShader = fragmentShader;
-			pipelineDesc.primitiveTopology = LLGL::PrimitiveTopology::TriangleList;
+			pipelineDesc.primitiveTopology = LLGL::PrimitiveTopology::TriangleStrip;
 			pipelineDesc.renderPass = pSwapChain->GetRenderPass();
 			pipelineDesc.rasterizer.cullMode = LLGL::CullMode::Front;
 
@@ -110,10 +101,10 @@ namespace Lithe {
 
 		}
 
-		{
-			pCommandQueue = pRenderer->GetCommandQueue();
-			pCommands = pRenderer->CreateCommandBuffer();
-		}
+		
+		pCommandQueue = pRenderer->GetCommandQueue();
+		pCommands = pRenderer->CreateCommandBuffer();
+		
 
 
 		{
@@ -124,7 +115,7 @@ namespace Lithe {
 			pCameraBuffer = pRenderer->CreateBuffer(cameraBufferDesc);
 			
 			LLGL::BufferDescriptor entityBufferDesc;
-			entityBufferDesc.size = (sizeof(glm::mat4) + sizeof(glm::vec4)) * 100;
+			entityBufferDesc.size = (sizeof(glm::mat4) + sizeof(glm::vec4)) * RenderSystem::MAX_ENTITIES;
 			entityBufferDesc.bindFlags = LLGL::BindFlags::ConstantBuffer;
 			entityBufferDesc.cpuAccessFlags = LLGL::CPUAccessFlags::Write;
 			pEntityBuffer = pRenderer->CreateBuffer(entityBufferDesc);
@@ -139,8 +130,8 @@ namespace Lithe {
 			};
 			layoutDesc.uniforms = {
 				LLGL::UniformDescriptor{ "uViewProjection", LLGL::UniformType::Float4x4,	1   },
-				LLGL::UniformDescriptor{ "uTransforms",		LLGL::UniformType::Float4x4,	100 },
-				LLGL::UniformDescriptor{ "uColors",			LLGL::UniformType::Float4,		100 },
+				LLGL::UniformDescriptor{ "uTransforms",		LLGL::UniformType::Float4x4,	RenderSystem::MAX_ENTITIES },
+				LLGL::UniformDescriptor{ "uColors",			LLGL::UniformType::Float4,		RenderSystem::MAX_ENTITIES },
 			};
 
 			auto pipelineLayout = pRenderer->CreatePipelineLayout(layoutDesc);
@@ -152,7 +143,6 @@ namespace Lithe {
 
 	}
 
-
 	void Renderer::draw(const Scene& scene, const Lithe::Camera* camera) {
 		if (!camera) {
 			Log::WARN("No active camera; skipping rendering");
@@ -161,9 +151,10 @@ namespace Lithe {
 
 		pRenderer->WriteBuffer(*pCameraBuffer, 0, glm::value_ptr(camera->viewProjection()), sizeof(glm::mat4));
 		
-		pRenderer->WriteBuffer(*pVertexBuffer, 0, &vertices, sizeof(vertices));
+		const auto& vertices = RenderSystem::buildVertices(scene);
+		pRenderer->WriteBuffer(*pVertexBuffer, 0, vertices.data(), vertices.size() * sizeof(RenderSystem::Vertex));
 
-		auto eb = RenderSystem::buildEntityBuffer(scene);
+		const auto& eb = RenderSystem::buildEntityBuffer(scene);
 		pRenderer->WriteBuffer(*pEntityBuffer, 0, eb.buffer.data(), eb.buffer.size());
 
 
@@ -173,11 +164,11 @@ namespace Lithe {
 		{
 			pCommands->Clear(LLGL::ClearFlags::Color, { 0.1f, 0.1f, 0.1f, 1.0f });
 			pCommands->SetPipelineState(*pPipeline);
-
+				
 			pCommands->SetResourceHeap(*pResourceHeap);
 
 			pCommands->SetVertexBuffer(*pVertexBuffer);
-			pCommands->DrawInstanced(3, 0, eb.entityCount);
+			pCommands->DrawInstanced(vertices.size(), 0, eb.entityCount);
 		}
 		pCommands->EndRenderPass();
 		pCommands->End();
