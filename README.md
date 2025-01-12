@@ -1,49 +1,33 @@
 
-## Build the project
-The engine supports Windows, MacOS and Linux. To compile the project choose one of the available default presets:
 
-| OS      | Debug       | Release       |
-| ------- | ----------- | ------------- |
-| Windows | x64-debug   | x64-release   |
-| MacOS   | macos-debug | macos-release |
-| Linux   | linux-debug | linux-release |
+# Introduction
+**Lithe** is a 2D, simple, cross-platform, lightweight C++ game engine built for learning purposes.
 
-Or create your custom build by creating a `CMakeUserPresets.json` file.
+---
 
-<br>
 
-To install the dependencies run:
-<details open>
-	<summary>Windows</summary>
-	```bash
-		./scripts/setup.bat
-	```
-</details>
-<details>
-	<summary>MacOS/Linux</summary>
-	```bash
-		./scripts/setup.sh
-	```
-</details>
+## Install Dependencies
+The engine supports **Windows**, **MacOS**, and **Linux**.
 
-<br>
+Before building the project, install the required dependency by running the following command, replacing "*your_preset*" with one of the following ones based on your operating system:
 
-To start building simply run:
-<details open>
-	<summary>Windows</summary>
-	```bash
-		cmake --build --preset x64-release
-	```
-</details>
-<details>
-	<summary>MacOS</summary>
-	```bash
-		cmake --build --preset macos-release
-	```
-</details>
-<details>
-	<summary>Linux</summary>
-	```bash
-		cmake --build --preset linux-release
-	```
-</details>
+| OS      | Debug         | Release         |
+| ------- | ------------- | --------------- |
+| Windows | `x64-debug`   | `x64-release`   |
+| MacOS   | `macos-debug` | `macos-release` |
+| Linux   | `linux-debug` | `linux-release` |
+
+```bash
+cmake --preset "your_preset"
+```
+
+---
+
+# Build the Project
+To compile the project, you can choose one of the default presets (as shown in the table above) and running the following command:
+```bash
+cmake --build --preset "your_preset"
+```
+
+Alternatively, you can create a custom build by defining a `CMakeUserPresets.json` file.
+
