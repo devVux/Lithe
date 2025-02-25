@@ -18,18 +18,18 @@ jobs:
         include:
           - compiler: clang
             config: debug
-            preset: windows-debug
+            preset: win-debug
             build_preset: windows-debug
           - compiler: clang
             config: release
-            preset: windows-release
+            preset: win-release
             build_preset: windows-release
           - compiler: msvc
-            config: debug
+            config: vs2022-debug
             preset: vs2022-debug
             build_preset: vs2022-debug
           - compiler: msvc
-            config: release
+            config: vs2022-release
             preset: vs2022-release
             build_preset: vs2022-release
     
