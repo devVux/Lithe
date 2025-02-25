@@ -80,18 +80,10 @@ namespace Lithe {
 		glfwDestroyWindow(pWindow);
 	}
 
-	bool Lithe::Window::GetNativeHandle(void* nativeHandle, std::size_t nativeHandleSize) {
+	bool Window::GetNativeHandle(void* nativeHandle, std::size_t nativeHandleSize) {
 		if (nativeHandle != nullptr && nativeHandleSize == sizeof(LLGL::NativeHandle)) {
 			auto* handle = reinterpret_cast<LLGL::NativeHandle*>(nativeHandle);
-			
-			#if defined(__APPLE__)
-				handle->responder = glfwGetCocoaWindow(pWindow);
-			#elif defined(_WIN32)
-				handle->window = glfwGetWin32Window(pWindow);
-			#elif defined(__linux__)
-				handle->window = glfwGetX11Window(pWindow);
-			#endif
-
+			handle->window = glfwGetWin32Window(pWindow);
 			return true;
 		}
 		return false;

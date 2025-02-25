@@ -1,14 +1,14 @@
 {
-    "name": "my-project",
-    "version": "1.0.0",
-    "dependencies": [
-        "entt",
-        "glfw3",
-        "glm",
-        "gtest",
-        "spdlog",
-        "stb",
-        "box2d"
-    ],
-    "builtin-baseline": "3508985146f1b1d248c67ead13f8f54be5b4f5da"
+  "name": "lithe",
+  "version": "1.0.0",
+  "dependencies": [
+    "entt",
+    "glfw3",
+    "glm",
+    "gtest",
+    "spdlog",
+    "stb",
+    "box2d"
+  ],
+  "builtin-baseline": "b69712e331604d988093981007360257c362c81f"
 }

@@ -18,7 +18,7 @@ namespace Lithe {
 
 	void Application::init() {
 		LLGL::RenderSystemDescriptor rendererDesc;
-		rendererDesc.moduleName = MODULE_NAME;
+	rendererDesc.moduleName = LITHE_RENDERER;
 
 		if (!glfwInit())
 			Lithe::Log::ERR("Could not load GLFW");

@@ -9,6 +9,8 @@ namespace Lithe {
 
 		public:
 
+			virtual ~Camera() = default;
+
 			virtual void update(const Time::Timestep ts) = 0;
 
 			virtual glm::mat4 view() const = 0;

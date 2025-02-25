@@ -1,18 +1,41 @@
 ﻿
-.DS_Store
-.vs/
-vcpkg_installed/
-.idea/
-.cache/
-cmake-build-debug/
+# CMake build artifacts
+CMakeCache.txt
 CMakeFiles/
+cmake_install.cmake
+CMakePresets.json
+CTestTestfile.cmake
+Testing/
+compile_commands.json
+DartConfiguration.tcl
+
+# IDE-specific files
+.idea/
+.vs/
+.vscode/
+*.sln
+*.suo
+*.user
+*.user.*
+.cache/
+_deps/
+
+# vcpkg artifacts
+vcpkg_installed/
+vcpkg-manifest-install.log
+
+# Output binaries
 out/
 
-vcpkg-manifest-install.log
-CMakeCache.txt
-Sandbox/cmake_install.cmake
-Lithe/cmake_install.cmake
+# macOS-specific files
+.DS_Store
+
+# Ninja build artifacts
 build.ninja
 
-
+# Custom build artifacts
 compile_commands.json
+*.cmake
+*.log
+*.swp
+*.tmp

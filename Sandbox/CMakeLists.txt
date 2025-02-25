@@ -1,24 +1,15 @@
-﻿cmake_minimum_required(VERSION 3.8)
+project(Sandbox LANGUAGES C CXX)
 
-project(Sandbox)
-
-set(SOURCES
+add_executable(Sandbox)
+target_sources(Sandbox PRIVATE
     "Sandbox.cpp"
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} PRIVATE Lithe)
+target_link_libraries(Sandbox PRIVATE
+    Lithe
+)
 
-if(LITHE_RENDERER STREQUAL "Metal")
-    target_link_libraries(${PROJECT_NAME} PRIVATE LLGL_Metal)
-elseif(LITHE_RENDERER STREQUAL "OpenGL")
-    target_link_libraries(${PROJECT_NAME} PRIVATE LLGL_OpenGL)
-endif()
-
-add_custom_command(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy 
-    "${CMAKE_BINARY_DIR}/compile_commands.json" 
-    "${CMAKE_SOURCE_DIR}/compile_commands.json"
+set_target_properties(Sandbox PROPERTIES
+    CXX_STANDARD 23
+    CXX_STANDARD_REQUIRED ON
 )

@@ -4,7 +4,6 @@
 #include <LLGL/RenderSystem.h>
 #include <LLGL/CommandBufferFlags.h>
 
-#include "Lithe/Core/Window.h"
 #include "Lithe/Scene/Scene.h"
 #include "Lithe/Scene/Camera.h"
 

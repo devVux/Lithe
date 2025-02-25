@@ -5,8 +5,14 @@
 #include "Lithe/Core/RenderSystem.h"
 #include "Lithe/Utils/Utils.h"
 
+#include <LLGL/Format.h>
+#include <LLGL/RenderSystemFlags.h>
 #include <LLGL/Window.h>
+
+#include <LLGL/PipelineState.h>
+#include <LLGL/PipelineLayoutFlags.h>
 #include <LLGL/Utils/VertexFormat.h>
+#include <LLGL/Shader.h>
 
 #include <glm/ext.hpp>
 #define GLM_ENABLE_EXPERIMENTAL 
@@ -57,8 +63,8 @@ namespace Lithe {
 			vertexDesc.source = SHADERS_DIR"default.glsl.vert";
 #endif
 
-			vertexDesc.entryPoint = VERTEX_ENTRY_POINT;
-			vertexDesc.profile = VERTEX_PROFILE;
+			vertexDesc.entryPoint = "main";
+			vertexDesc.profile = "version 420 core";
 			vertexDesc.vertex.inputAttribs = vertexFormat.attributes;
 			vertexShader = pRenderer->CreateShader(vertexDesc);
 
@@ -72,8 +78,8 @@ namespace Lithe {
 				fragmentDesc.source = SHADERS_DIR"default.glsl.frag";
 			#endif
 
-			fragmentDesc.entryPoint = FRAGMENT_ENTRY_POINT;
-			fragmentDesc.profile = FRAGMENT_PROFILE;
+			fragmentDesc.entryPoint = "main";
+			fragmentDesc.profile = "version 420 core";
 			fragmentShader = pRenderer->CreateShader(fragmentDesc);
 
 			// Check for shader compilation error
@@ -129,9 +135,9 @@ namespace Lithe {
 				LLGL::BindingDescriptor{ "EntityBuffer", LLGL::ResourceType::Buffer, LLGL::BindFlags::ConstantBuffer, LLGL::StageFlags::VertexStage, 1 },
 			};
 			layoutDesc.uniforms = {
-				LLGL::UniformDescriptor{ "uViewProjection", LLGL::UniformType::Float4x4,	1   },
-				LLGL::UniformDescriptor{ "uTransforms",		LLGL::UniformType::Float4x4,	RenderSystem::MAX_ENTITIES },
-				LLGL::UniformDescriptor{ "uColors",			LLGL::UniformType::Float4,		RenderSystem::MAX_ENTITIES },
+				LLGL::UniformDescriptor( "uViewProjection", LLGL::UniformType::Float4x4,	1   ),
+				LLGL::UniformDescriptor( "uTransforms",		LLGL::UniformType::Float4x4,	RenderSystem::MAX_ENTITIES ),
+				LLGL::UniformDescriptor( "uColors",			LLGL::UniformType::Float4,		RenderSystem::MAX_ENTITIES ),
 			};
 
 			auto pipelineLayout = pRenderer->CreatePipelineLayout(layoutDesc);
@@ -162,7 +168,7 @@ namespace Lithe {
 		pCommands->SetViewport(pSwapChain->GetResolution());
 		pCommands->BeginRenderPass(*pSwapChain);
 		{
-			pCommands->Clear(LLGL::ClearFlags::Color, { 0.1f, 0.1f, 0.1f, 1.0f });
+			pCommands->Clear(LLGL::ClearFlags::Color);
 			pCommands->SetPipelineState(*pPipeline);
 				
 			pCommands->SetResourceHeap(*pResourceHeap);

@@ -18,7 +18,7 @@ namespace Lithe {
 			}
 			virtual ~Window();
 
-			virtual bool GetNativeHandle(void* nativeHandle, std::size_t nativeHandleSize)  override;
+			virtual bool GetNativeHandle(void* nativeHandle, std::size_t nativeHandleSize) override;
 			virtual bool AdaptForVideoMode(LLGL::Extent2D* resolution, bool* fullscreen) override;
 			virtual void ResetPixelFormat() override;
 
