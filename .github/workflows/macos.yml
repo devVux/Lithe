@@ -30,7 +30,6 @@ jobs:
     - name: Install dependencies
       run: |
         brew install cmake ninja
-        git clone https://github.com/microsoft/vcpkg.git vendor/vcpkg
         ./vendor/vcpkg/bootstrap-vcpkg.sh
 
     - name: Configure CMake
