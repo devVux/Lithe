@@ -41,8 +41,7 @@ jobs:
     - name: Install vcpkg
       run: |
         git clone https://github.com/microsoft/vcpkg.git vendor/vcpkg
-        cd vendor/vcpkg
-        .\bootstrap-vcpkg.bat
+        ./vendor/vcpkg/bootstrap-vcpkg.sh
 
     - name: Setup LLVM/Clang (if using Clang)
       if: matrix.compiler == 'clang'
