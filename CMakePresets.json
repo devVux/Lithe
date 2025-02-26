@@ -52,7 +52,11 @@
       "inherits": "base",
       "hidden": true,
       "generator": "Visual Studio 17 2022",
-      "architecture": "x64"
+      "architecture": "x64",
+	  "cacheVariables": {
+		"CMAKE_C_COMPILER": "cl.exe",
+		"CMAKE_CXX_COMPILER": "cl.exe"
+	  }
     },
     {
       "name": "vs2022-debug",
