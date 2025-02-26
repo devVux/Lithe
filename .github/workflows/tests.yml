@@ -1,0 +1,31 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [master, dev, actions]
+  pull_request:
+    branches: [master, dev]
+  workflow_dispatch:
+
+jobs:
+  test-linux:  # Renamed for clarity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential ninja-build libgl1-mesa-dev xorg-dev
+          ./vendor/vcpkg/bootstrap-vcpkg.sh
+
+      - name: Configure CMake
+        run: cmake --preset=linux-debug
+
+      - name: Build
+        run: cmake --build --preset=linux-debug
+
+      - name: Test
+        run: ctest --preset=ci-tests-linux

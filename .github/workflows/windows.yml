@@ -59,6 +59,3 @@ jobs:
     - name: Build
       run: cmake --build --preset=${{ matrix.build_preset }}
 
-    - name: Test
-      if: matrix.config == 'debug'
-      run: ctest --preset=ci-tests-windows
