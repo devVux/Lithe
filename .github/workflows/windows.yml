@@ -42,11 +42,11 @@ jobs:
 
     - name: Setup LLVM/Clang (if using Clang)
       if: matrix.compiler == 'clang'
-      uses: KyleMayes/install-llvm-action@v1
+      uses: KyleMayes/install-llvm-action@v2
       with:
         version: "18.1.8"
 
-    - name: Install Ninja
+    - name: Install Ninja (if using Clang)
       if: matrix.compiler == 'clang'
       run: |
           if (-not (Get-Command ninja -ErrorAction SilentlyContinue)) {
