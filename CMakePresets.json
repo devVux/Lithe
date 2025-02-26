@@ -74,11 +74,14 @@
       "environment": {
         "VCPKG_DEFAULT_TRIPLET": "x64-osx"
       },
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++",
-        "LITHE_RENDERER": "Metal"
-      }
+	  "cacheVariables": {
+		"CMAKE_C_COMPILER": "clang",
+		"CMAKE_CXX_COMPILER": "clang++",
+		"CMAKE_OBJCXX_COMPILER": "clang++",
+		"CMAKE_OBJC_COMPILER": "clang",
+		"LITHE_RENDERER": "Metal",
+		"CMAKE_OBJCXX_COMPILE_OBJECT": "<CMAKE_OBJCXX_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> -c <SOURCE>"
+	  }
     },
     {
       "name": "macos-debug",

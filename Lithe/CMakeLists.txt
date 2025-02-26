@@ -53,7 +53,7 @@ set(LLGL_BUILD_RENDERER_DIRECT3D11 OFF)
 set(LLGL_BUILD_RENDERER_VULKAN OFF)
 
 if(LITHE_RENDERER STREQUAL "OpenGL")
-    set(LLGL_BUILD_RENDERER_OPENGL ON)
+    set(LLGL_BUILD_RENDERER_OPENGL ON )
 elseif(LITHE_RENDERER STREQUAL "Metal")
     set(LLGL_BUILD_RENDERER_METAL ON)
 elseif(LITHE_RENDERER STREQUAL "Direct3D11")
@@ -89,6 +89,11 @@ if(WIN32)
 	list(APPEND PLATFORM_SOURCES "src/Platform/Windows/Window.cpp")
 elseif(APPLE)
     list(APPEND PLATFORM_SOURCES "src/Platform/MacOS/Window.mm")
+	set_source_files_properties(
+		${PLATFORM_SOURCES}
+		PROPERTIES
+		SKIP_PRECOMPILE_HEADERS ON
+	)
 elseif(UNIX AND NOT APPLE)  # Linux
 	list(APPEND PLATFORM_SOURCES "src/Platform/Linux/Window.cpp")
 endif()
@@ -143,11 +148,10 @@ target_include_directories(Lithe PUBLIC
 # Platform-Specific Configuration
 # ----------------------------
 if(APPLE)
-    find_package(Metal REQUIRED)
     target_link_libraries(Lithe PRIVATE
         "-framework Cocoa"
+		"-framework Metal"
         "-framework QuartzCore"
-        Metal::Metal
     )
     target_compile_definitions(Lithe PRIVATE
         GLFW_EXPOSE_NATIVE_COCOA
@@ -166,9 +170,6 @@ endif()
 # Dependency Linking
 # ----------------------------
 target_link_libraries(Lithe PRIVATE LLGL)
-target_link_libraries(Lithe PRIVATE 
-    $<IF:$<TARGET_EXISTS:LLGL_${LITHE_RENDERER}>,LLGL_${LITHE_RENDERER},LLGL>
-)
 target_link_libraries(Lithe PRIVATE glfw)
 target_link_libraries(Lithe PUBLIC  glm::glm)
 target_link_libraries(Lithe PUBLIC  box2d::box2d)
