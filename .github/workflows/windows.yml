@@ -40,7 +40,7 @@ jobs:
 
     - name: Install vcpkg
       run: |
-        ./vendor/vcpkg/bootstrap-vcpkg.sh
+        ./vendor/vcpkg/bootstrap-vcpkg.bat
 
     - name: Setup LLVM/Clang (if using Clang)
       if: matrix.compiler == 'clang'
