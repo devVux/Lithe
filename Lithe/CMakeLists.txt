@@ -154,7 +154,7 @@ if(APPLE)
         "-framework QuartzCore"
     )
     target_compile_definitions(Lithe PRIVATE
-        GLFW_EXPOSE_NATIVE_COCOA
+        pLFW_EXPOSE_NATIVE_COCOA
     )
 elseif(WIN32)
     target_compile_definitions(Lithe PRIVATE
@@ -181,7 +181,7 @@ target_link_libraries(Lithe PRIVATE spdlog::spdlog)
 target_compile_features(Lithe PUBLIC cxx_std_23)
 
 if(MSVC)
-    target_compile_options(Lithe PRIVATE /W4 /permissive-)
+	target_compile_options(Lithe PRIVATE /W4 /permissive- /utf-8)
 else()
     target_compile_options(Lithe PRIVATE -Wall -Wextra -Wpedantic)
 endif()
