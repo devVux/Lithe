@@ -13,6 +13,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
+        fail-fast: false
         include:
           - compiler: clang
             config: debug

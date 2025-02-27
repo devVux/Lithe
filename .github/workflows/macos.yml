@@ -13,6 +13,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
+        fail-fast: false
         config: [debug, release]
         include:
           - config: debug
