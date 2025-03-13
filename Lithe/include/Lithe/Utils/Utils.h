@@ -20,19 +20,19 @@ std::unique_ptr<T> makeUnique(Args&&... args) {
 }
 
 
-template<typename T = int32_t>
+template<typename T, typename U = uint32_t>
 struct Extent {
 	union {
-		struct { T width, height; };
-		struct { T x, y; };
+		struct { U width, height; };
+		struct { U x, y; };
 	};
 
 
-	Extent(T w, T h): width(w), height(h) { }
+	Extent(T w, T h): width(static_cast<U>(w)), height(static_cast<U>(h)) { }
 
-	template<typename U = T>
-	Extent(const Extent<U>& other) {
-		width = static_cast<T>(other.width);
-		height = static_cast<T>(other.height);
+	template<typename _T = T>
+	Extent(const Extent<_T, U>& other) {
+		width = static_cast<U>(other.width);
+		height = static_cast<U>(other.height);
 	}
 };

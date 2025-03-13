@@ -42,8 +42,8 @@ namespace Lithe {
 			}
 			bool AdaptForVideoMode(LLGL::Extent2D* resolution, bool* fullscreen) final override {
 				pWindow->resize({ 
-					static_cast<int32_t>(resolution->width), 
-					static_cast<int32_t>(resolution->height)
+					static_cast<long>(resolution->width), 
+					static_cast<long>(resolution->height)
 				});
 				return true;
 			}

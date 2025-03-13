@@ -4,8 +4,8 @@
 #include "Utils.h"
 
 #ifdef _WIN32
-	#include <windows.h>
-	using NativeWindowHandle = HWND;
+	#include <wtypes.h>
+	using NativeWindowHandle = struct HWND__*;
 #elif defined(__APPLE__)
 	using NativeWindowHandle = class NSWindow;
 #else
@@ -22,20 +22,18 @@ namespace Lithe {
 
 		public:
 			
-			using Size = Extent<int32_t>;
+			using Size = Extent<long>;
 			using Pos = Size;
 
-			Window(EventDispatcher* dispatcher, std::string title = "Simple Window", Size size = { 800, 600 }, Pos position = { -1, -1 });
+			Window(EventDispatcher* dispatcher, std::string title = "Simple Window", Size size = { 800, 600 }, Pos position = { 0, 0 }, bool centered = true);
 			Window(const Window& other) = delete;
 			Window(Window&&) = delete;
 			Window& operator=(const Window&) = delete;
 			Window& operator=(Window&&) = delete;
-			~Window() = default;
+			~Window();
 
-			void init(EventDispatcher* dispatcher);
-
-			void processEvents() const;
 			
+			void processEvents() const;
 			void show() const;
 			void hide() const;
 			void resize(Size size);
@@ -43,16 +41,25 @@ namespace Lithe {
 			void rename(const std::string& title);
 
 
-			[[nodiscard]] virtual NativeWindowHandle handle() const;
+			[[nodiscard]] NativeWindowHandle handle() const { return pNativeHandle; }
 			[[nodiscard]] Size size() const;
 			[[nodiscard]] Size screenSize() const;
 			[[nodiscard]] Size position() const;
 			[[nodiscard]] std::string title() const;
+			[[nodiscard]] bool shouldClose() const;
 							
+
+			#ifdef _WIN32
+				void dispatchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
+			#elif defined(__APPLE__)
+			#else
+			#endif
 
 		private:
 
-			WinImpl* pImpl;
+			EventDispatcher* pDispatcher;
+			NativeWindowHandle pNativeHandle;
+			bool mCentered;
 
 	};
 
