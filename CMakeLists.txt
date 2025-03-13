@@ -30,8 +30,7 @@ add_subdirectory(Lithe)
 add_subdirectory(Sandbox)
 add_subdirectory(Editor)
 
-#enable_testing()
-#include(CTest)
+include(CTest)
 
 # Copy compile_commands.json to the source directory
 if (NOT MSVC)

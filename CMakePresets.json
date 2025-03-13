@@ -22,8 +22,9 @@
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
       "binaryDir": "${sourceDir}/out/build/windows",
       "cacheVariables": {
-		"CMAKE_C_COMPILER": "clang.exe",
-		"CMAKE_CXX_COMPILER": "clang++.exe"
+        "CMAKE_C_COMPILER": "clang.exe",
+        "CMAKE_CXX_COMPILER": "clang++.exe",
+        "LITHE_RENDERER": "OpenGL"
       }
     },
     {
@@ -49,22 +50,25 @@
       "generator": "Visual Studio 17 2022",
       "architecture": "x64",
       "binaryDir": "${sourceDir}/out/build/vs2022/debug",
-	  "cacheVariables": {
-		"CMAKE_C_COMPILER": "cl.exe",
-		"CMAKE_CXX_COMPILER": "cl.exe",
-		"CMAKE_C_FLAGS": "${CMAKE_C_FLAGS} /w",
-		"CMAKE_CXX_FLAGS": "${CMAKE_CXX_FLAGS} /w"
-	  }
+      "cacheVariables": {
+        "LITHE_RENDERER": "OpenGL"
+      }
     },
     {
       "name": "vs2022-debug",
       "inherits": "vs2022-base",
-      "displayName": "VS 2022 Debug"
+      "displayName": "VS 2022 Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     },
     {
       "name": "vs2022-release",
       "inherits": "vs2022-base",
-      "displayName": "VS 2022 Release"
+      "displayName": "VS 2022 Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
     },
     {
       "name": "macos-base",
