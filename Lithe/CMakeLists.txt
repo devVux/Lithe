@@ -30,7 +30,7 @@ elseif(WIN32)
     set(LITHE_RENDERER_DEFAULT "Direct3D11")
 endif()
 
-set(LITHE_RENDERER "${LITHE_RENDERER_DEFAULT}" CACHE STRING "Renderer backend (OpenGL, Metal, etc.)" FORCE)
+set(LITHE_RENDERER "${LITHE_RENDERER_DEFAULT}" CACHE STRING "Renderer backend (OpenGL, Metal, etc.)")
 set_property(CACHE LITHE_RENDERER PROPERTY STRINGS "OpenGL;Metal;Direct3D11;Vulkan")
 
 # ----------------------------
