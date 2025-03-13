@@ -5,16 +5,15 @@
 #include "Window.h"
 #include "RenderSystem.h"
 #include "Utils.h"
+#include "WindowWrapper.h"
 
+#include <LLGL/LLGL.h>
 #include <LLGL/Format.h>
 #include <LLGL/RenderSystemFlags.h>
-#include <LLGL/LLGL.h>
 #include <LLGL/PipelineState.h>
 #include <LLGL/PipelineLayoutFlags.h>
 #include <LLGL/Utils/VertexFormat.h>
 #include <LLGL/Shader.h>
-#include <LLGL/Surface.h>
-#include <LLGL/Platform/NativeHandle.h>
 
 #include <glm/ext.hpp>
 #define GLM_ENABLE_EXPERIMENTAL 
@@ -24,38 +23,7 @@ namespace Lithe {
 
 	#define MAX_VERTICES 100
 
-	class Wrapper: public LLGL::Surface {
-		public:
-			Wrapper(Lithe::Window* window): pWindow(window) { }
-
-			virtual bool GetNativeHandle(void* nativeHandle, std::size_t nativeHandleSize) final override {
-				if (nativeHandle != nullptr && nativeHandleSize == sizeof(LLGL::NativeHandle)) {
-					auto* handle = reinterpret_cast<LLGL::NativeHandle*>(nativeHandle);
-					handle->window = pWindow->handle();
-					return true;
-				}
-				return false;
-			}
-			LLGL::Extent2D GetContentSize() const final override {
-				Extent<uint32_t> size = pWindow->size();
-				return { size.width, size.height };
-			}
-			bool AdaptForVideoMode(LLGL::Extent2D* resolution, bool* fullscreen) final override {
-				pWindow->resize({ 
-					static_cast<long>(resolution->width), 
-					static_cast<long>(resolution->height)
-				});
-				return true;
-			}
-			LLGL::Display* FindResidentDisplay() const final override {
-				return LLGL::Display::GetPrimary();
-			}
-
-		private:
-
-			Lithe::Window* pWindow;
-
-	};
+	
 
 	void Renderer::init(SharedPtr<Lithe::Window> window) {
 		
@@ -71,7 +39,7 @@ namespace Lithe {
 			LLGL::SwapChainDescriptor swapChainDesc;
 			swapChainDesc.resolution = { 800, 600 };
 			swapChainDesc.samples = 1;
-			pSwapChain = pRenderer->CreateSwapChain(swapChainDesc, makeShared<Wrapper>(window.get()));
+			pSwapChain = pRenderer->CreateSwapChain(swapChainDesc, makeShared<WindowWrapper>(window.get()));
 		}
 
 		LLGL::Shader* vertexShader;

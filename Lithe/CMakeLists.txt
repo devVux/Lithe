@@ -82,7 +82,10 @@ find_package(box2d CONFIG REQUIRED)
 # Platform-specific source filtering
 set(PLATFORM_SOURCES "")
 if(WIN32)
-	list(APPEND PLATFORM_SOURCES "src/Platform/Windows/Win32Window.cpp")
+	list(APPEND PLATFORM_SOURCES 
+		"src/Platform/Windows/Win32Window.cpp"
+		"src/Platform/Windows/Win32WindowWrapper.cpp"
+	)
 elseif(APPLE)
     list(APPEND PLATFORM_SOURCES "src/Platform/MacOS/Window.mm")
 	set_source_files_properties(
@@ -157,16 +160,13 @@ target_include_directories(Lithe PRIVATE
 # ----------------------------
 # Platform-Specific Configuration
 # ----------------------------
-if(APPLE)
+if (WIN32)
+elseif(APPLE)
     target_link_libraries(Lithe PRIVATE
         "-framework Cocoa"
 		"-framework Metal"
         "-framework QuartzCore"
     )
-    target_compile_definitions(Lithe PRIVATE
-        GLFW_EXPOSE_NATIVE_COCOA
-    )
-elseif(WIN32)
 else()
 endif()
 

@@ -15,10 +15,7 @@
 namespace Lithe {
 	class EventDispatcher;
 
-
 	class Window {
-
-		class WinImpl;
 
 		public:
 			
