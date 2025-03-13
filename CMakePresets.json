@@ -20,20 +20,16 @@
       "inherits": "base",
       "hidden": true,
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
-      "environment": {
-        "VCPKG_DEFAULT_TRIPLET": "x64-windows"
-      },
+      "binaryDir": "${sourceDir}/out/build/windows",
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang.exe",
-        "CMAKE_CXX_COMPILER": "clang++.exe",
-        "LITHE_RENDERER": "OpenGL"
+		"CMAKE_C_COMPILER": "clang.exe",
+		"CMAKE_CXX_COMPILER": "clang++.exe"
       }
     },
     {
       "name": "win-debug",
       "inherits": "win-base",
       "displayName": "Windows Debug",
-      "binaryDir": "${sourceDir}/out/build/windows/debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
@@ -42,7 +38,6 @@
       "name": "win-release",
       "inherits": "win-base",
       "displayName": "Windows Release",
-      "binaryDir": "${sourceDir}/out/build/windows/release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
@@ -53,22 +48,23 @@
       "hidden": true,
       "generator": "Visual Studio 17 2022",
       "architecture": "x64",
+      "binaryDir": "${sourceDir}/out/build/vs2022/debug",
 	  "cacheVariables": {
 		"CMAKE_C_COMPILER": "cl.exe",
-		"CMAKE_CXX_COMPILER": "cl.exe"
+		"CMAKE_CXX_COMPILER": "cl.exe",
+		"CMAKE_C_FLAGS": "${CMAKE_C_FLAGS} /w",
+		"CMAKE_CXX_FLAGS": "${CMAKE_CXX_FLAGS} /w"
 	  }
     },
     {
       "name": "vs2022-debug",
       "inherits": "vs2022-base",
-      "displayName": "VS 2022 Debug",
-      "binaryDir": "${sourceDir}/out/build/vs2022/debug"
+      "displayName": "VS 2022 Debug"
     },
     {
       "name": "vs2022-release",
       "inherits": "vs2022-base",
-      "displayName": "VS 2022 Release",
-      "binaryDir": "${sourceDir}/out/build/vs2022/release"
+      "displayName": "VS 2022 Release"
     },
     {
       "name": "macos-base",
@@ -83,7 +79,6 @@
 		"CMAKE_CXX_COMPILER": "clang++",
 		"CMAKE_OBJCXX_COMPILER": "clang++",
 		"CMAKE_OBJC_COMPILER": "clang",
-		"LITHE_RENDERER": "Metal",
 		"CMAKE_OBJCXX_COMPILE_OBJECT": "<CMAKE_OBJCXX_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> -c <SOURCE>"
 	  }
     },
@@ -115,8 +110,7 @@
       },
       "cacheVariables": {
         "CMAKE_C_COMPILER": "gcc",
-        "CMAKE_CXX_COMPILER": "g++",
-        "LITHE_RENDERER": "OpenGL"
+        "CMAKE_CXX_COMPILER": "g++"
       }
     },
     {

@@ -1,7 +1,6 @@
 project(Sandbox LANGUAGES C CXX)
 
-add_executable(Sandbox)
-target_sources(Sandbox PRIVATE
+add_executable(Sandbox
     "Sandbox.cpp"
 )
 

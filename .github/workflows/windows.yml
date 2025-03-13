@@ -7,13 +7,12 @@ on:
     branches: [ master, dev ]
   workflow_dispatch:
 
-
 jobs:
   build-windows:
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         include:
           - compiler: clang
             config: debug
@@ -33,9 +32,15 @@ jobs:
             build_preset: vs2022-release
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
+
+    - name: Setup ccache (Clang)
+      if: matrix.compiler == 'clang'
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: windows-${{ matrix.compiler }}-${{ matrix.config }}
 
     - name: Install vcpkg
       run: |
@@ -60,3 +65,9 @@ jobs:
     - name: Build
       run: cmake --build --preset=${{ matrix.build_preset }}
 
+    - name: Cache vcpkg
+      uses: actions/cache@v3
+      with:
+        path: ./vendor/vcpkg/installed
+        key: vcpkg-windows-${{ matrix.compiler }}-${{ hashFiles('**/vcpkg.json') }}
+        restore-keys: vcpkg-windows-${{ matrix.compiler }}-

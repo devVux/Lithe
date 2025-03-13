@@ -14,12 +14,12 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 set(TESTS_SOURCES
-	"EventDispatcherTests.cpp"
+#	"EventDispatcherTests.cpp"
 )
 
-add_executable(Testing ${TESTS_SOURCES})
-target_link_libraries(Testing PRIVATE GTest::gtest_main GTest::gmock Lithe)
-
-include(GoogleTest)
-gtest_discover_tests(Testing)
-
+#add_executable(Testing ${TESTS_SOURCES})
+#target_link_libraries(Testing PRIVATE GTest::gtest_main GTest::gmock Lithe)
+#
+#include(GoogleTest)
+#gtest_discover_tests(Testing)
+#

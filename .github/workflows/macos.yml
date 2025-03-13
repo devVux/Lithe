@@ -7,13 +7,12 @@ on:
     branches: [ master, dev ]
   workflow_dispatch:
 
-
 jobs:
   build-macos:
     runs-on: macos-latest
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         config: [debug, release]
         include:
           - config: debug
@@ -24,9 +23,14 @@ jobs:
             build_preset: macos-release
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: macos-${{ matrix.config }}
 
     - name: Install dependencies
       run: |
@@ -39,3 +43,9 @@ jobs:
     - name: Build
       run: cmake --build --preset=${{ matrix.build_preset }}
 
+    - name: Cache vcpkg
+      uses: actions/cache@v3
+      with:
+        path: ./vendor/vcpkg/installed
+        key: vcpkg-macos-${{ hashFiles('**/vcpkg.json') }}
+        restore-keys: vcpkg-macos-

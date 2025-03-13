@@ -11,8 +11,8 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         config: [debug, release]
         include:
           - config: debug
@@ -23,9 +23,14 @@ jobs:
             build_preset: linux-release
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: linux-${{ matrix.config }}
 
     - name: Install dependencies
       run: |
@@ -39,3 +44,9 @@ jobs:
     - name: Build
       run: cmake --build --preset=${{ matrix.build_preset }}
 
+    - name: Cache vcpkg
+      uses: actions/cache@v3
+      with:
+        path: ./vendor/vcpkg/installed
+        key: vcpkg-linux-${{ hashFiles('**/vcpkg.json') }}
+        restore-keys: vcpkg-linux-
