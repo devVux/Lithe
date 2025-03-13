@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Application.h"
 
+#include <LLGL/LLGL.h>
 #include "Lithe/Core/Log.h"
 #include "Lithe/Core/Clock.h"
 #include "Lithe/Events/Event.h"
@@ -9,6 +10,7 @@
 #include "Lithe/Scene/OrthographicCamera.h"
 #include "Lithe/Scene/Components.h"
 
+#include <LLGL/RenderSystemFlags.h>
 #include <Utils/Utils.h>
 
 #include <glm/ext/matrix_transform.hpp>
@@ -17,14 +19,9 @@
 namespace Lithe {
 
 	void Application::init() {
-		LLGL::RenderSystemDescriptor rendererDesc;
-	rendererDesc.moduleName = LITHE_RENDERER;
 
-		if (!glfwInit())
-			Lithe::Log::ERR("Could not load GLFW");
-
-		pWindow = makeShared<Lithe::Window>(mDispatcher, LLGL::Extent2D(1200, 800), "Main window");
-		mRenderer.init(pWindow, rendererDesc);
+		pWindow = makeShared<Lithe::Window>(&mDispatcher, "Main window", Window::Size(1200, 800));
+		mRenderer.init(pWindow);
 
 		Input::setInput(pWindow.get());
 
@@ -61,7 +58,7 @@ namespace Lithe {
 
 			mRenderer.draw(*mSceneManager.active(), mSceneManager.activeCamera().get());
 
-			pWindow->ProcessEvents();
+			pWindow->processEvents();
 		}
 
 

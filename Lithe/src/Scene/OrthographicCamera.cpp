@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "OrthographicCamera.h"
 
+#include "Lithe/Events/Event.h"
 #include "Lithe/Events/Input.h"
 
 #include <glm/gtc/matrix_transform.hpp>

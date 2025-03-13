@@ -64,8 +64,8 @@ namespace Lithe {
 
 
 
-	void Window::init(EventDispatcher& dispatcher) {
-		glfwSetWindowUserPointer(pWindow, reinterpret_cast<void*>(&dispatcher));
+	void Window::init(EventDispatcher* dispatcher) {
+		glfwSetWindowUserPointer(pWindow, reinterpret_cast<void*>(dispatcher));
 
 		glfwSetKeyCallback(pWindow, onKeyCallback);
 		glfwSetMouseButtonCallback(pWindow, onMouseButtonCallback);
@@ -102,8 +102,8 @@ namespace Lithe {
 	
 	GLFWwindow* Window::CreateGLFWWindow() {
 		auto window = glfwCreateWindow(mSize.width, mSize.height, mTitle.c_str(), nullptr, nullptr);
-		if (!window)
-			Lithe::Log::FATAL("Could not create the window");
+		if (!window) {}
+			// Lithe::Log::FATAL("Could not create the window");
 
 		return window;
 	}

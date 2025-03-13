@@ -1,12 +1,10 @@
 #pragma once
 
-#include <LLGL/LLGL.h>
-#include <LLGL/RenderSystem.h>
-#include <LLGL/CommandBufferFlags.h>
-
+#include "Utils.h"
+#include "Window.h"
 #include "Lithe/Scene/Scene.h"
 #include "Lithe/Scene/Camera.h"
-
+#include "ForwardDecls.h"
 
 namespace Lithe {
 
@@ -14,14 +12,14 @@ namespace Lithe {
 
 		public:
 
-			void init(std::shared_ptr<LLGL::Surface> surface, const LLGL::RenderSystemDescriptor& descriptor);
+			void init(SharedPtr<Lithe::Window> window);
 
 			void draw(const Scene& scene, const Lithe::Camera* camera);
 
 
 		private:
 
-			LLGL::RenderSystemPtr pRenderer			{ nullptr };
+			LLGL::RenderSystem* pRenderer			{ nullptr };
 			LLGL::SwapChain* pSwapChain				{ nullptr };
 			LLGL::CommandQueue* pCommandQueue		{ nullptr };
 			LLGL::CommandBuffer* pCommands			{ nullptr };

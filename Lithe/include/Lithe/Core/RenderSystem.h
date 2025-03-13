@@ -7,7 +7,7 @@
 
 namespace Lithe {
 
-	class RenderSystem {
+	class OurRenderSystem {
 		
 		public:
 		
@@ -74,7 +74,7 @@ namespace Lithe {
 
 			template<class... Components>
 			struct EntityBuffer {
-				friend class RenderSystem;
+				friend class OurRenderSystem;
 
 				alignas(16) std::array<uint8_t, (sizeof(Components[MAX_ENTITIES]) + ...)> buffer;
 				std::array<int, sizeof...(Components)> strides;

@@ -2,7 +2,7 @@
 
 #include "Lithe/Lithe.h"
 
-int main() {
+LITHE_EXPORT void Lithe::start(Lithe::ApplicationCreateFunc create) {
 
 	using namespace Lithe;
 	Logger::init("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
@@ -11,9 +11,8 @@ int main() {
 	EventBus bus(dispatcher);
 
 
-	Application* application = Lithe::create(dispatcher);
+	Application* application = create(dispatcher);
 	application->init();
-
 
 
 	bus.start();

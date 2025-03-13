@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Lithe/Core/Window.h"
+#include "Lithe/Events/Event.h"
 
 namespace Lithe {
 
@@ -13,16 +14,16 @@ namespace Lithe {
 		public:
 
 			static bool isKeyDown(Keys keyCode) {
-				return glfwGetKey((GLFWwindow*) pWindow->native(), keyCode) == GLFW_PRESS;
+				return false; //return glfwGetKey(pWindow->handle(), keyCode) == GLFW_PRESS;
 			}
 
 			static bool isMouseButtonDown(MouseButtons button) {
-				return glfwGetMouseButton((GLFWwindow*) pWindow->native(), button) == GLFW_PRESS;
+				return false; //return glfwGetMouseButton(pWindow->handle(), button) == GLFW_PRESS;
 			}
 
 			static MouseCoords mousePos() {
 				double x, y;
-				glfwGetCursorPos((GLFWwindow*) pWindow->native(), &x, &y);
+				//glfwGetCursorPos(pWindow->handle(), &x, &y);
 				return { x, y };
 			}
 

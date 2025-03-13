@@ -1,41 +1,77 @@
 #include "pch.h"
-#include "Renderer.h"
 
-#include "Lithe/Core/Log.h"
-#include "Lithe/Core/RenderSystem.h"
-#include "Lithe/Utils/Utils.h"
+#include "Log.h"
+#include "Renderer.h"
+#include "Window.h"
+#include "RenderSystem.h"
+#include "Utils.h"
 
 #include <LLGL/Format.h>
 #include <LLGL/RenderSystemFlags.h>
-#include <LLGL/Window.h>
-
+#include <LLGL/LLGL.h>
 #include <LLGL/PipelineState.h>
 #include <LLGL/PipelineLayoutFlags.h>
 #include <LLGL/Utils/VertexFormat.h>
 #include <LLGL/Shader.h>
+#include <LLGL/Surface.h>
+#include <LLGL/Platform/NativeHandle.h>
 
 #include <glm/ext.hpp>
 #define GLM_ENABLE_EXPERIMENTAL 
 #include <glm/gtx/string_cast.hpp>
+
 namespace Lithe {
 
-#define MAX_VERTICES 100
+	#define MAX_VERTICES 100
 
+	class Wrapper: public LLGL::Surface {
+		public:
+			Wrapper(Lithe::Window* window): pWindow(window) { }
 
+			virtual bool GetNativeHandle(void* nativeHandle, std::size_t nativeHandleSize) final override {
+				if (nativeHandle != nullptr && nativeHandleSize == sizeof(LLGL::NativeHandle)) {
+					auto* handle = reinterpret_cast<LLGL::NativeHandle*>(nativeHandle);
+					handle->window = pWindow->handle();
+					return true;
+				}
+				return false;
+			}
+			LLGL::Extent2D GetContentSize() const final override {
+				Extent<uint32_t> size = pWindow->size();
+				return { size.width, size.height };
+			}
+			bool AdaptForVideoMode(LLGL::Extent2D* resolution, bool* fullscreen) final override {
+				pWindow->resize({ 
+					static_cast<int32_t>(resolution->width), 
+					static_cast<int32_t>(resolution->height)
+				});
+				return true;
+			}
+			LLGL::Display* FindResidentDisplay() const final override {
+				return LLGL::Display::GetPrimary();
+			}
 
+		private:
 
-	void Renderer::init(SharedPtr<LLGL::Surface> surface, const LLGL::RenderSystemDescriptor& descriptor) {
-		{
-			pRenderer = LLGL::RenderSystem::Load(descriptor);
-			if (!pRenderer)
-				Lithe::Log::FATAL("Could not load renderer {}", descriptor.moduleName);
-		}
+			Lithe::Window* pWindow;
+
+	};
+
+	void Renderer::init(SharedPtr<Lithe::Window> window) {
+		
+		LLGL::RenderSystemDescriptor rendererDesc;
+		rendererDesc.moduleName = LITHE_RENDERER;
+
+		pRenderer = LLGL::RenderSystem::Load(rendererDesc).release();
+		if (!pRenderer)
+			Log::FATAL("Could not load renderer {}", rendererDesc.moduleName);
+
 		
 		{
 			LLGL::SwapChainDescriptor swapChainDesc;
 			swapChainDesc.resolution = { 800, 600 };
 			swapChainDesc.samples = 1;
-			pSwapChain = pRenderer->CreateSwapChain(swapChainDesc, surface);
+			pSwapChain = pRenderer->CreateSwapChain(swapChainDesc, makeShared<Wrapper>(window.get()));
 		}
 
 		LLGL::Shader* vertexShader;
@@ -46,7 +82,7 @@ namespace Lithe {
 			vertexFormat.AppendAttribute({ "position", LLGL::Format::RGB32Float });
 
 			LLGL::BufferDescriptor bufferDesc;
-			bufferDesc.size = sizeof(RenderSystem::Vertex) * MAX_VERTICES * 4;
+			bufferDesc.size = sizeof(OurRenderSystem::Vertex) * MAX_VERTICES * 4;
 			bufferDesc.bindFlags = LLGL::BindFlags::VertexBuffer;
 			bufferDesc.vertexAttribs = vertexFormat.attributes;
 			bufferDesc.cpuAccessFlags = LLGL::CPUAccessFlags::Write;
@@ -85,7 +121,7 @@ namespace Lithe {
 			// Check for shader compilation error
 			for (LLGL::Shader* shader : { vertexShader, fragmentShader })
 				if (const LLGL::Report* report = shader->GetReport())
-					Lithe::Log::ERR("Shader compilation report: {}", report->GetText());
+					Log::ERR("Shader compilation report: {}", std::string(report->GetText()));
 
 		}
 
@@ -103,7 +139,7 @@ namespace Lithe {
 
 			// Check for pipeline creation errors
 			if (const LLGL::Report* report = pPipeline->GetReport())
-				Lithe::Log::ERR("Pipeline creation report: {}", report->GetText());
+				Log::ERR("Pipeline creation report: {}", std::string(report->GetText()));
 
 		}
 
@@ -121,7 +157,7 @@ namespace Lithe {
 			pCameraBuffer = pRenderer->CreateBuffer(cameraBufferDesc);
 			
 			LLGL::BufferDescriptor entityBufferDesc;
-			entityBufferDesc.size = (sizeof(glm::mat4) + sizeof(glm::vec4)) * RenderSystem::MAX_ENTITIES;
+			entityBufferDesc.size = (sizeof(glm::mat4) + sizeof(glm::vec4)) * OurRenderSystem::MAX_ENTITIES;
 			entityBufferDesc.bindFlags = LLGL::BindFlags::ConstantBuffer;
 			entityBufferDesc.cpuAccessFlags = LLGL::CPUAccessFlags::Write;
 			pEntityBuffer = pRenderer->CreateBuffer(entityBufferDesc);
@@ -136,8 +172,8 @@ namespace Lithe {
 			};
 			layoutDesc.uniforms = {
 				LLGL::UniformDescriptor( "uViewProjection", LLGL::UniformType::Float4x4,	1   ),
-				LLGL::UniformDescriptor( "uTransforms",		LLGL::UniformType::Float4x4,	RenderSystem::MAX_ENTITIES ),
-				LLGL::UniformDescriptor( "uColors",			LLGL::UniformType::Float4,		RenderSystem::MAX_ENTITIES ),
+				LLGL::UniformDescriptor( "uTransforms",		LLGL::UniformType::Float4x4,	OurRenderSystem::MAX_ENTITIES ),
+				LLGL::UniformDescriptor( "uColors",			LLGL::UniformType::Float4,		OurRenderSystem::MAX_ENTITIES ),
 			};
 
 			auto pipelineLayout = pRenderer->CreatePipelineLayout(layoutDesc);
@@ -157,10 +193,10 @@ namespace Lithe {
 
 		pRenderer->WriteBuffer(*pCameraBuffer, 0, glm::value_ptr(camera->viewProjection()), sizeof(glm::mat4));
 		
-		const auto& vertices = RenderSystem::buildVertices(scene);
-		pRenderer->WriteBuffer(*pVertexBuffer, 0, vertices.data(), vertices.size() * sizeof(RenderSystem::Vertex));
+		const auto& vertices = OurRenderSystem::buildVertices(scene);
+		pRenderer->WriteBuffer(*pVertexBuffer, 0, vertices.data(), vertices.size() * sizeof(OurRenderSystem::Vertex));
 
-		const auto& eb = RenderSystem::buildEntityBuffer(scene);
+		const auto& eb = OurRenderSystem::buildEntityBuffer(scene);
 		pRenderer->WriteBuffer(*pEntityBuffer, 0, eb.buffer.data(), eb.buffer.size());
 
 

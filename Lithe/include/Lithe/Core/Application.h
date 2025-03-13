@@ -1,15 +1,14 @@
 #pragma once
 
 #include "Renderer.h"
-#include "Lithe/Core/Window.h"
-#include "Lithe/Events/EventDispatcher.h"
-
+#include "Window.h"
+#include "EventDispatcher.h"
 #include "Lithe/Scene/Scene.h"
-
+#include "Export.h"
 
 namespace Lithe {
 
-	class Application {
+class LITHE_EXPORT Application {
 
 		public:
 
@@ -32,7 +31,7 @@ namespace Lithe {
 		private:
 
 			Renderer mRenderer; 
-			std::shared_ptr<Window> pWindow { nullptr };
+			SharedPtr<Window> pWindow { nullptr };
 
 			EventDispatcher& mDispatcher;
 
@@ -42,7 +41,8 @@ namespace Lithe {
 
 	};
 	
+	typedef Application* (*ApplicationCreateFunc)(EventDispatcher& dispatcher);
 
-	extern Application* create(EventDispatcher&);
+	LITHE_EXPORT void start(ApplicationCreateFunc createFunc);
 
 }

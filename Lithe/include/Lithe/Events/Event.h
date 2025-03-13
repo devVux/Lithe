@@ -78,11 +78,11 @@ namespace Lithe {
 		};
 
 		struct MouseButtonPressedEvent: public MouseButtonEvent {
-			MouseButtonPressedEvent(int button, int mods): MouseButtonEvent(button, mods) { }
+			MouseButtonPressedEvent(int button, int mods = 0): MouseButtonEvent(button, mods) { }
 		};
 
 		struct MouseButtonReleasedEvent: public MouseButtonEvent {
-			MouseButtonReleasedEvent(int button, int mods): MouseButtonEvent(button, mods) { }
+			MouseButtonReleasedEvent(int button, int mods = 0): MouseButtonEvent(button, mods) { }
 		};
 
 		struct MouseScrollEvent: public Event {

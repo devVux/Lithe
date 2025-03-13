@@ -1,47 +1,58 @@
 #pragma once
 
-#include <LLGL/LLGL.h>
-#include <LLGL/Types.h>
-#include <Lithe/Events/EventDispatcher.h>
+#include <string>
+#include "Utils.h"
 
-class GLFWwindow;
+#ifdef _WIN32
+	#include <windows.h>
+	using NativeWindowHandle = HWND;
+#elif defined(__APPLE__)
+	using NativeWindowHandle = class NSWindow;
+#else
+	using NativeWindowHandle = void*; // Fallback or Linux-specific type
+#endif
 
 namespace Lithe {
+	class EventDispatcher;
 
-	class Window: public LLGL::Surface {
-		
+
+	class Window {
+
+		class WinImpl;
+
 		public:
+			
+			using Size = Extent<int32_t>;
+			using Pos = Size;
 
-			Window(EventDispatcher& dispatcher, const LLGL::Extent2D& size, const char* title):
-				pWindow(CreateGLFWWindow()), mTitle(title), mSize(size), mDispatcher(dispatcher) {
-				init(dispatcher);
-			}
-			virtual ~Window();
+			Window(EventDispatcher* dispatcher, std::string title = "Simple Window", Size size = { 800, 600 }, Pos position = { -1, -1 });
+			Window(const Window& other) = delete;
+			Window(Window&&) = delete;
+			Window& operator=(const Window&) = delete;
+			Window& operator=(Window&&) = delete;
+			~Window() = default;
 
-			virtual bool GetNativeHandle(void* nativeHandle, std::size_t nativeHandleSize) override;
-			virtual bool AdaptForVideoMode(LLGL::Extent2D* resolution, bool* fullscreen) override;
-			virtual void ResetPixelFormat() override;
+			void init(EventDispatcher* dispatcher);
 
-			virtual LLGL::Display* FindResidentDisplay() const override { return LLGL::Display::GetPrimary(); }
-			LLGL::Extent2D GetContentSize() const override { return mSize; }
+			void processEvents() const;
+			
+			void show() const;
+			void hide() const;
+			void resize(Size size);
+			void move(Pos pos);
+			void rename(const std::string& title);
 
-			void* native() const { return pWindow; }
+
+			[[nodiscard]] virtual NativeWindowHandle handle() const;
+			[[nodiscard]] Size size() const;
+			[[nodiscard]] Size screenSize() const;
+			[[nodiscard]] Size position() const;
+			[[nodiscard]] std::string title() const;
+							
 
 		private:
 
-			void init(EventDispatcher& dispatcher);
-
-			GLFWwindow* CreateGLFWWindow();
-
-
-		private:
-
-			LLGL::Extent2D mSize;
-			std::string mTitle;
-
-			GLFWwindow* pWindow { nullptr };
-			EventDispatcher& mDispatcher;
-
+			WinImpl* pImpl;
 
 	};
 

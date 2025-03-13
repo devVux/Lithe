@@ -76,10 +76,11 @@ namespace Lithe {
 			}
 
 			// Enqueue an event for processing
-			template<typename E>
+			template<typename E, typename... Args>
 			requires IsEvent<E>
-			void enqueue(const E& event) {
+			void enqueue(Args&&... args) {
 				std::lock_guard<std::mutex> lock(mQueueMutex);
+				E event(std::forward<Args>(args)...);
 				mEventQueue.push(std::make_shared<EventWrapper<E>>(event));
 			}
 
@@ -88,9 +89,9 @@ namespace Lithe {
 					std::shared_ptr<EventWrapperBase> event;
 					{
 						std::lock_guard<std::mutex> lock(mQueueMutex);
-						if (mEventQueue.empty()) {
+						if (mEventQueue.empty())
 							break;
-						}
+
 						event = std::move(mEventQueue.front());
 						mEventQueue.pop();
 					}

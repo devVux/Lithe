@@ -14,6 +14,10 @@ class Sandbox: public Lithe::Application {
 	
 };
 
-Lithe::Application* Lithe::create(Lithe::EventDispatcher& dispatcher) {
+Lithe::Application* create(Lithe::EventDispatcher& dispatcher) {
 	return new Sandbox(dispatcher);
+}
+
+int main() {
+	Lithe::start(&create);
 }
