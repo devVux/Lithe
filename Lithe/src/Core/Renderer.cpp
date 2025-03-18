@@ -67,8 +67,6 @@ namespace Lithe {
 			vertexDesc.profile = "1.1";
 #else
 			vertexDesc.source = SHADERS_DIR"default.glsl.vert";
-			vertexDesc.entryPoint = "main";
-			vertexDesc.profile = "version 420 core";
 #endif
 
 			vertexDesc.vertex.inputAttribs = vertexFormat.attributes;
@@ -84,8 +82,6 @@ namespace Lithe {
 				fragmentDesc.profile = "1.1";
 			#else
 				fragmentDesc.source = SHADERS_DIR"default.glsl.frag";
-				fragmentDesc.entryPoint = "main";
-				fragmentDesc.profile = "version 420 core";
 			#endif
 
 			fragmentShader = pRenderer->CreateShader(fragmentDesc);

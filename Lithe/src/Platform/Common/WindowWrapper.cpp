@@ -29,7 +29,7 @@ namespace Lithe {
 	}
 	
 	bool WindowWrapper::AdaptForVideoMode(LLGL::Extent2D* resolution, bool* fullscreen) {
-		pWindow->resize({ resolution->width, resolution->height });
+		pWindow->resize(Extent<long>(resolution->width, resolution->height));
 		return true;
 	}
 
