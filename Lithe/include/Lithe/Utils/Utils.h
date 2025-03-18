@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fmt/core.h>
 #include <memory>
 
 
@@ -20,19 +21,27 @@ std::unique_ptr<T> makeUnique(Args&&... args) {
 }
 
 
-template<typename T, typename U = uint32_t>
+template<typename T = uint32_t>
 struct Extent {
 	union {
-		struct { U width, height; };
-		struct { U x, y; };
+		struct { T width, height; };
+		struct { T x, y; };
 	};
 
 
-	Extent(T w, T h): width(static_cast<U>(w)), height(static_cast<U>(h)) { }
+	Extent(T w, T h): width(w), height(h) { }
 
-	template<typename _T = T>
-	Extent(const Extent<_T, U>& other) {
-		width = static_cast<U>(other.width);
-		height = static_cast<U>(other.height);
+	template<typename _U, typename _T = T>
+	static _U to(const Extent<_T>& extent) {
+		return _U(
+			static_cast<_T>(extent.width),
+			static_cast<_T>(extent.height)
+		);
 	}
+
+	template<typename _U, typename _T = T>
+	_U to() const {
+		return Extent::to<_U, _T>(*this);
+	}
+		
 };

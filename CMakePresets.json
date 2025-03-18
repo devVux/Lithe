@@ -80,10 +80,7 @@
       },
 	  "cacheVariables": {
 		"CMAKE_C_COMPILER": "clang",
-		"CMAKE_CXX_COMPILER": "clang++",
-		"CMAKE_OBJCXX_COMPILER": "clang++",
-		"CMAKE_OBJC_COMPILER": "clang",
-		"CMAKE_OBJCXX_COMPILE_OBJECT": "<CMAKE_OBJCXX_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> -c <SOURCE>"
+		"CMAKE_CXX_COMPILER": "clang++"
 	  }
     },
     {

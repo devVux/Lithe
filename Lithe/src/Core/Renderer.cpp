@@ -37,7 +37,7 @@ namespace Lithe {
 		
 		{
 			LLGL::SwapChainDescriptor swapChainDesc;
-			swapChainDesc.resolution = { 800, 600 };
+			swapChainDesc.resolution = window->size().to<LLGL::Extent2D>();
 			swapChainDesc.samples = 1;
 			pSwapChain = pRenderer->CreateSwapChain(swapChainDesc, makeShared<WindowWrapper>(window.get()));
 		}
@@ -63,12 +63,14 @@ namespace Lithe {
 
 #if (__APPLE__)
 			vertexDesc.source = SHADERS_DIR"default.msl.vert";
+			vertexDesc.entryPoint = "vertex_main";
+			vertexDesc.profile = "1.1";
 #else
 			vertexDesc.source = SHADERS_DIR"default.glsl.vert";
-#endif
-
 			vertexDesc.entryPoint = "main";
 			vertexDesc.profile = "version 420 core";
+#endif
+
 			vertexDesc.vertex.inputAttribs = vertexFormat.attributes;
 			vertexShader = pRenderer->CreateShader(vertexDesc);
 
@@ -78,12 +80,14 @@ namespace Lithe {
 
 			#if (__APPLE__)
 				fragmentDesc.source = SHADERS_DIR"default.msl.frag";
+				fragmentDesc.entryPoint = "fragment_main";
+				fragmentDesc.profile = "1.1";
 			#else
 				fragmentDesc.source = SHADERS_DIR"default.glsl.frag";
+				fragmentDesc.entryPoint = "main";
+				fragmentDesc.profile = "version 420 core";
 			#endif
 
-			fragmentDesc.entryPoint = "main";
-			fragmentDesc.profile = "version 420 core";
 			fragmentShader = pRenderer->CreateShader(fragmentDesc);
 
 			// Check for shader compilation error

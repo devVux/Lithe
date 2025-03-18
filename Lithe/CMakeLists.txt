@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
+
 project(Lithe LANGUAGES C CXX)
+if(APPLE)
+    enable_language(OBJCXX)
+endif()
 
 # ----------------------------
 # Configuration Options
@@ -80,18 +84,24 @@ find_package(box2d CONFIG REQUIRED)
 # Target Configuration
 # ----------------------------
 # Platform-specific source filtering
+set(COMMON_SOURCES 
+	"src/Platform/Common/WindowWrapper.cpp"
+)
 set(PLATFORM_SOURCES "")
 if(WIN32)
 	list(APPEND PLATFORM_SOURCES 
 		"src/Platform/Windows/Win32Window.cpp"
-		"src/Platform/Windows/Win32WindowWrapper.cpp"
 	)
 elseif(APPLE)
-    list(APPEND PLATFORM_SOURCES "src/Platform/MacOS/Window.mm")
+    list(APPEND PLATFORM_SOURCES 
+		"src/Platform/MacOS/CocoaWindow.mm"
+	)
 	set_source_files_properties(
 		${PLATFORM_SOURCES}
+		${COMMON_SOURCES}
 		PROPERTIES
 		SKIP_PRECOMPILE_HEADERS ON
+		LANGUAGE OBJCXX
 	)
 elseif(UNIX AND NOT APPLE)  # Linux
 	list(APPEND PLATFORM_SOURCES "src/Platform/Linux/Window.cpp")
@@ -104,6 +114,7 @@ set(SOURCES
 	"src/Core/EntryPoint.cpp"
     "src/Core/Renderer.cpp"
     
+	${COMMON_SOURCES}
 	${PLATFORM_SOURCES}
 
     "src/Scene/OrthographicCamera.cpp"
@@ -118,8 +129,8 @@ endif()
 
 target_compile_definitions(Lithe PRIVATE LITHE_RENDERER="${LITHE_RENDERER}")
 target_compile_definitions(Lithe PUBLIC 
-    ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
-    SHADERS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/shaders"
+    ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/"
+    SHADERS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/shaders/"
 )
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
