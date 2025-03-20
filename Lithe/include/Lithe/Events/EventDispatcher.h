@@ -37,8 +37,9 @@ namespace Lithe {
 			struct EventWrapper: public EventWrapperBase {
 			
 				public:
-			
-					explicit EventWrapper(E event): mEvent(std::move(event)) { }
+					
+					template <typename... Args>
+					explicit EventWrapper(Args&&... args): mEvent(std::forward<Args>(args)...) { }
 					void dispatch(EventDispatcher& dispatcher) const override {
 						dispatcher.dispatch(mEvent);
 					}
@@ -80,8 +81,7 @@ namespace Lithe {
 			requires IsEvent<E>
 			void enqueue(Args&&... args) {
 				std::lock_guard<std::mutex> lock(mQueueMutex);
-				E event(std::forward<Args>(args)...);
-				mEventQueue.push(std::make_shared<EventWrapper<E>>(event));
+				mEventQueue.emplace(std::make_shared<EventWrapper<E>>(std::forward<Args>(args)...));
 			}
 
 			void processQueue() {
