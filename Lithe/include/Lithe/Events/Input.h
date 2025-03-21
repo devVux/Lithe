@@ -1,42 +1,42 @@
 #pragma once
 
-#include "Lithe/Core/Window.h"
-#include "Lithe/Events/Event.h"
+#include "Event.h"
+#include "Utils.h"
 
 namespace Lithe {
-
-	struct MouseCoords {
-		double x, y;
-	};
+	class Window;
 
 	class Input {
 
 		public:
 
-			static bool isKeyDown(Keys keyCode) {
-				return false; //return glfwGetKey(pWindow->handle(), keyCode) == GLFW_PRESS;
+			static void setWindow(SharedPtr<Window> window) {
+				pWindow = std::move(window);
 			}
 
-			static bool isMouseButtonDown(MouseButtons button) {
-				return false; //return glfwGetMouseButton(pWindow->handle(), button) == GLFW_PRESS;
+			static bool isKeyUp(Key code) { 
+				return isKey(code, State::RELEASED);
+			}
+			static bool isKeyDown(Key code) {  
+				return isKey(code, State::PRESSED);
 			}
 
-			static MouseCoords mousePos() {
-				double x, y;
-				//glfwGetCursorPos(pWindow->handle(), &x, &y);
-				return { x, y };
+			static bool isMouseUp(Button button) {
+				return isMouse(button, State::RELEASED);
+			}
+			static bool isMouseButtonDown(Button button) {
+				return isMouse(button, State::PRESSED);
 			}
 
-			static void setInput(Lithe::Window* window) {
-				if (window != nullptr)
-					pWindow = window;
-			}
+			static MousePos mousePos();
+
+
+			static bool isKey(Key code, State state);
+			static bool isMouse(Button button, State state);
 
 		private:
 
-			static inline Lithe::Window* pWindow { nullptr };
+			static inline SharedPtr<Lithe::Window> pWindow { nullptr };
 		
 	};
-
-
 }
