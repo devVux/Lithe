@@ -150,10 +150,15 @@ target_precompile_headers(Lithe PRIVATE
 # ----------------------------
 # Include Directories
 # ----------------------------
-target_include_directories(Lithe PUBLIC
+target_include_directories(Lithe 
+	PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>
-	$<INSTALL_INTERFACE:include>
+		$<INSTALL_INTERFACE:include/Lithe>
+
+	PRIVATE
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/private>
+
 )
 
 foreach(dir IN LISTS INC_DIR)
