@@ -3,6 +3,8 @@
 #include "Utils.h"
 #include "InternalTypes.h"
 
+#include <string>
+
 namespace Lithe {
 	class EventDispatcher;
 
