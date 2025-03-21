@@ -1,28 +1,7 @@
 #pragma once
 
-#include <string>
 #include "Utils.h"
-
-#ifdef _WIN32
-	#include <wtypes.h>
-	using NativeWindowHandle = struct HWND__*;
-#elif defined(__APPLE__)
-	#ifdef __OBJC__
-		@class NSResponder;
-		@class NSString;
-		@class NSObject;
-	#else
-		class NSResponder;
-		class NSString;
-		struct objc_object;
-	#endif
-
-	using NativeWindowHandle = NSResponder*;
-	using NSNotificationName = NSString*;
-	using id = struct objc_object*;
-#else
-	using NativeWindowHandle = void*; // Fallback or Linux-specific type
-#endif
+#include "InternalTypes.h"
 
 namespace Lithe {
 	class EventDispatcher;
@@ -31,8 +10,6 @@ namespace Lithe {
 
 		public:
 			
-			using Size = Extent<long>;
-			using Pos = Size;
 
 			Window(EventDispatcher* dispatcher, std::string title = "Simple Window", Size size = { 800, 600 }, Pos position = { 0, 0 }, bool centered = true);
 			Window(const Window& other) = delete;

@@ -91,6 +91,7 @@ set(PLATFORM_SOURCES "")
 if(WIN32)
 	list(APPEND PLATFORM_SOURCES 
 		"src/Platform/Windows/Win32Window.cpp"
+		"src/Platform/Windows/Win32Input.cpp"
 	)
 elseif(APPLE)
     list(APPEND PLATFORM_SOURCES 
@@ -152,8 +153,8 @@ target_precompile_headers(Lithe PRIVATE
 # ----------------------------
 target_include_directories(Lithe 
 	PUBLIC
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>
 		$<INSTALL_INTERFACE:include/Lithe>
 
 	PRIVATE
@@ -167,11 +168,6 @@ foreach(dir IN LISTS INC_DIR)
         $<INSTALL_INTERFACE:include/${dir}>
     )
 endforeach()
-
-target_include_directories(Lithe PRIVATE
-	$<BUILD_INTERFACE:${LLGL_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
 
 # ----------------------------
 # Platform-Specific Configuration

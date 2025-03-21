@@ -30,6 +30,7 @@ struct Extent {
 
 
 	Extent(T w, T h): width(w), height(h) { }
+	Extent(const Extent& other) = default;
 
 	template<typename _U, typename _T = T>
 	static _U to(const Extent<_T>& extent) {
@@ -45,3 +46,7 @@ struct Extent {
 	}
 		
 };
+
+using Size = Extent<long>;
+using Pos = Size;
+using MousePos = Extent<double>;
