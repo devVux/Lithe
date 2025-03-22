@@ -75,7 +75,6 @@ add_subdirectory(
 # Dependency Management
 # ----------------------------
 find_package(spdlog CONFIG REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(box2d CONFIG REQUIRED)
 #find_package(Stb CONFIG REQUIRED)
@@ -186,7 +185,6 @@ endif()
 # Dependency Linking
 # ----------------------------
 target_link_libraries(Lithe PRIVATE LLGL)
-target_link_libraries(Lithe PRIVATE glfw)
 target_link_libraries(Lithe PUBLIC  glm::glm)
 target_link_libraries(Lithe PUBLIC  box2d::box2d)
 target_link_libraries(Lithe PRIVATE spdlog::spdlog)
