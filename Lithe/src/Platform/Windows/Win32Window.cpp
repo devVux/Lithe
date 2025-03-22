@@ -1,14 +1,11 @@
 #include "pch.h"
 #include "Window.h"
 
-#include "Log.h"
-
-#include "Event.h"
-#include "EventDispatcher.h"
-#include "WindowEvents.h"
-#include "MouseEvents.h"
-#include "KeyEvents.h"
 #include "Utils.h"
+#include "WindowEvents.h"
+#include "KeyEvents.h"
+#include "MouseEvents.h"
+#include "Input.h"
 
 #include <winnt.h>
 #include <winuser.h>
@@ -149,7 +146,7 @@ namespace Lithe {
 	}
 
 	
-	Window::Window(EventDispatcher* pDispatcher, std::string title, Size size, Pos pos, bool centered): 
+	Window::Window(SharedPtr<EventDispatcher> pDispatcher, std::string title, Size size, Pos pos, bool centered): 
 		pDispatcher(pDispatcher), mCentered(centered) {
 
 		HINSTANCE instance = GetModuleHandle(nullptr);

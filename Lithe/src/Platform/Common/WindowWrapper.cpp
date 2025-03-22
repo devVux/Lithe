@@ -1,6 +1,5 @@
 #include "pch.h"
 
-#include "Lithe.h"
 #include "WindowWrapper.h"
 
 #include <LLGL/Platform/NativeHandle.h>

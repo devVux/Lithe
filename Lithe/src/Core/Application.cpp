@@ -4,16 +4,8 @@
 #include <LLGL/LLGL.h>
 #include <LLGL/RenderSystemFlags.h>
 
-#include "Lithe/Core/Log.h"
-#include "Lithe/Core/Clock.h"
-#include "Lithe/Events/Event.h"
-#include "Lithe/Events/Input.h"
-#include "Lithe/Events/WindowEvents.h"
-
-#include "Lithe/Scene/OrthographicCamera.h"
-#include "Lithe/Scene/Components.h"
-
-#include <Utils/Utils.h>
+#include "Clock.h"
+#include "OrthographicCamera.h"
 
 #include <glm/ext/matrix_transform.hpp>
 
@@ -22,11 +14,11 @@ namespace Lithe {
 
 	void Application::init() {
 
-		pWindow = makeShared<Lithe::Window>(&mDispatcher, "Main window", Size(1200, 800));
+		pWindow = makeShared<Lithe::Window>(pDispatcher, "Main window", Size(1200, 800));
 		Input::setWindow(pWindow);
 		mRenderer.init(pWindow);
 
-		mDispatcher.subscribe<WindowEvents::WindowClosedEvent>([this](const WindowEvents::WindowClosedEvent& e) {
+		pDispatcher->subscribe<WindowEvents::WindowClosedEvent>([this](const WindowEvents::WindowClosedEvent& e) {
 			stop();
 		});
 

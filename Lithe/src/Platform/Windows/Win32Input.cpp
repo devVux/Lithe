@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "Input.h"
 
-#include "Window.h"
-
 #include <windows.h>
 #include <utility>
 

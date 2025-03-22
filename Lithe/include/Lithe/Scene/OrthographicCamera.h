@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithe/Scene/Camera.h"
+#include "Camera.h"
 
 namespace Lithe {
 

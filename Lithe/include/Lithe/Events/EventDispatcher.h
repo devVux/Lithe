@@ -1,30 +1,25 @@
 #pragma once
 
-#include <Lithe/Events/Event.h>
-#include <Lithe/Core/Log.h>
+#include <Event.h>
+#include <Log.h>
 
-#include <iostream>
 #include <queue>
 #include <unordered_map>
 #include <vector>
-#include <functional>
-#include <typeindex>
-#include <thread>
 #include <mutex>
-#include <condition_variable>
-#include <atomic>
 #include <memory>
+
+class EventDispatcherTester;
 
 namespace Lithe {
 
 	template<typename E>
-	concept IsEvent = std::is_base_of<Event, E>::value;
+	concept IsEvent = std::is_base_of_v<Event, E>;
 
 
 
 	class EventDispatcher {
-
-		friend class EventDispatcherTest;
+		friend class ::EventDispatcherTester;
 
 		private:
 
@@ -100,7 +95,7 @@ namespace Lithe {
 			}
 
 
-		public:
+		private:
 
 			// Immediate dispatch of an event (thread-safe)
 			template<typename E>

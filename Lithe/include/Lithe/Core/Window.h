@@ -2,6 +2,7 @@
 
 #include "Utils.h"
 #include "InternalTypes.h"
+#include "EventDispatcher.h"
 
 #include <string>
 
@@ -13,7 +14,7 @@ namespace Lithe {
 		public:
 			
 
-			Window(EventDispatcher* dispatcher, std::string title = "Simple Window", Size size = { 800, 600 }, Pos position = { 0, 0 }, bool centered = true);
+			Window(SharedPtr<EventDispatcher> dispatcher, std::string title = "Simple Window", Size size = { 800, 600 }, Pos position = { 0, 0 }, bool centered = true);
 			Window(const Window& other) = delete;
 			Window(Window&&) = delete;
 			Window& operator=(const Window&) = delete;
@@ -46,7 +47,7 @@ namespace Lithe {
 
 		private:
 
-			EventDispatcher* pDispatcher;
+			SharedPtr<EventDispatcher> pDispatcher;
 			NativeWindowHandle pNativeHandle;
 			bool mCentered;
 

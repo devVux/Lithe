@@ -2,7 +2,6 @@
 
 #include "Window.h"
 
-#include <LLGL/LLGL.h>
 #include <LLGL/Surface.h>
 
 namespace Lithe { 

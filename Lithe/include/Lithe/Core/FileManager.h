@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithe/Lithe.h"
+#include "Log.h"
 
 #include <string>
 #include <fstream>
@@ -22,7 +22,7 @@ namespace Lithe {
 
 			Lithe::Log::INFO("Reading \"{}\"", absolutePath);
 			if (!istream.is_open()) {}
-				Lithe::Log::ERROR("Error while reading {}", absolutePath);
+				Lithe::Log::ERR("Error while reading {}", absolutePath);
 
 			std::stringstream buffer;
 			buffer << istream.rdbuf();

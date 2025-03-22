@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "PerspectiveCamera.h"
 
-#include "Lithe/Events/Input.h"
+#include "Input.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

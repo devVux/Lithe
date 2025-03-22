@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Event.h"
 #include "Utils.h"
+#include "Window.h"
+#include "Event.h"
 
 namespace Lithe {
-	class Window;
 
 	class Input {
 

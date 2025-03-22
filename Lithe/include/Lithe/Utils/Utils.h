@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Export.h"
 #include <memory>
 
 namespace Lithe {

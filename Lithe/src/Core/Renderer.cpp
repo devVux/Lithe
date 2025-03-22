@@ -1,10 +1,7 @@
 #include "pch.h"
-
-#include "Log.h"
 #include "Renderer.h"
-#include "Window.h"
+
 #include "RenderSystem.h"
-#include "Utils.h"
 #include "WindowWrapper.h"
 
 #include <LLGL/LLGL.h>

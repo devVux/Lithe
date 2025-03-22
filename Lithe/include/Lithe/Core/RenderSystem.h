@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Lithe/Scene/Scene.h"
-#include "Lithe/Scene/Components.h"
+#include "Scene.h"
+#include "Components.h"
+
 #include <array>
 #include <cstdint>
 

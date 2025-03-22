@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Utils.h"
-#include "Window.h"
-#include "Lithe/Scene/Scene.h"
-#include "Lithe/Scene/Camera.h"
 #include "ForwardDecls.h"
+#include "Window.h"
+#include "Scene.h"
 
 namespace Lithe {
 
