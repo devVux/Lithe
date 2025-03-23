@@ -28,4 +28,4 @@ jobs:
         run: cmake --build --preset vs2022-debug
 
       - name: Test
-        run: ctest --preset ci-tests-windows
+        run: .\out\build\vs2022\debug\bin\Testing.exe

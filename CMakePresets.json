@@ -182,40 +182,5 @@
       "configurePreset": "linux-release",
       "configuration": "Release"
     }
-  ],
-  "testPresets": [
-    {
-      "name": "ci-tests-windows",
-      "configurePreset": "win-debug",
-      "output": {
-        "outputOnFailure": true
-      },
-      "execution": {
-        "noTestsAction": "error",
-        "stopOnFailure": false
-      }
-    },
-    {
-      "name": "ci-tests-macos",
-      "configurePreset": "macos-debug",
-      "output": {
-        "outputOnFailure": true
-      },
-      "execution": {
-        "noTestsAction": "error",
-        "stopOnFailure": false
-      }
-    },
-    {
-      "name": "ci-tests-linux",
-      "configurePreset": "linux-debug",
-      "output": {
-        "outputOnFailure": true
-      },
-      "execution": {
-        "noTestsAction": "error",
-        "stopOnFailure": false
-      }
-    }
   ]
 }
