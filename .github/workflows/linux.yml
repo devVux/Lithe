@@ -11,8 +11,8 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         config: [debug, release]
         include:
           - config: debug
@@ -34,8 +34,8 @@ jobs:
         ./vendor/vcpkg/bootstrap-vcpkg.sh
 
     - name: Configure CMake
-      run: echo cmake --preset=${{ matrix.preset }}
+      run: echo cmake --preset ${{ matrix.preset }}
 
     - name: Build
-      run: cmake --build --preset=${{ matrix.build_preset }}
+      run: cmake --build --preset ${{ matrix.build_preset }}
 
