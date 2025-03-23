@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Window.h"
 
+#include "Utils.h"
 #include "Log.h"
 #include "Event.h"
 #include "WindowEvents.h"
@@ -37,8 +38,8 @@
 
 namespace Lithe {
 
-Window::Window(EventDispatcher* pDispatcher, std::string title, Size size, Pos pos, bool centered) : 
-    pDispatcher(pDispatcher), mCentered(centered) {
+Window::Window(SharedPtr<EventDispatcher> dispatcher, std::string title, Size size, Pos pos, bool centered) : 
+    pDispatcher(dispatcher), mCentered(centered) {
     
     @autoreleasepool {
         // Create app if needed
@@ -102,19 +103,19 @@ Window::Window(EventDispatcher* pDispatcher, std::string title, Size size, Pos p
                 
                 switch ([event type]) {
                     case NSEventTypeMouseMoved:
-                        pDispatcher->enqueue<MouseEvents::MouseMovedEvent>(locationInView.x, locationInView.y);
+                        pDispatcher->enqueue<MouseEvents::MouseMovedEvent>(MousePos(locationInView.x, locationInView.y));
                         break;
                     case NSEventTypeLeftMouseDown:
-                        pDispatcher->enqueue<MouseEvents::MouseButtonPressedEvent>(MouseButtons::BUTTON_1);
+                        pDispatcher->enqueue<MouseEvents::MouseButtonPressedEvent>(Button::_1);
                         break;
                     case NSEventTypeLeftMouseUp:
-                        pDispatcher->enqueue<MouseEvents::MouseButtonReleasedEvent>(MouseButtons::BUTTON_1);
+                        pDispatcher->enqueue<MouseEvents::MouseButtonReleasedEvent>(Button::_1);
                         break;
                     case NSEventTypeRightMouseDown:
-                        pDispatcher->enqueue<MouseEvents::MouseButtonPressedEvent>(MouseButtons::BUTTON_2);
+                        pDispatcher->enqueue<MouseEvents::MouseButtonPressedEvent>(Button::_2);
                         break;
                     case NSEventTypeRightMouseUp:
-                        pDispatcher->enqueue<MouseEvents::MouseButtonReleasedEvent>(MouseButtons::BUTTON_2);
+                        pDispatcher->enqueue<MouseEvents::MouseButtonReleasedEvent>(Button::_2);
                         break;
                     default:
                         break;
@@ -241,7 +242,7 @@ Size Window::screenSize() const {
 
 void Window::dispatchEvent(NSNotificationName notificationName, id sender) {
 	if ([notificationName isEqualToString:NSWindowWillCloseNotification])
-        pDispatcher->enqueue<WindowEvents::WindowCloseEvent>();
+        pDispatcher->enqueue<WindowEvents::WindowClosedEvent>();
 }
 
 }

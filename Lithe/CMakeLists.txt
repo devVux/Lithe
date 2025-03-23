@@ -95,6 +95,7 @@ if(WIN32)
 elseif(APPLE)
     list(APPEND PLATFORM_SOURCES 
 		"src/Platform/MacOS/CocoaWindow.mm"
+		"src/Platform/MacOS/CocoaInput.mm"
 	)
 	set_source_files_properties(
 		${PLATFORM_SOURCES}
