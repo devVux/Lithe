@@ -1,30 +1,26 @@
 #pragma once
 
-#include <Lithe/Events/Event.h>
-#include <Lithe/Core/Log.h>
+#include <Export.h>
+#include <Event.h>
+#include <Log.h>
 
-#include <iostream>
 #include <queue>
 #include <unordered_map>
 #include <vector>
-#include <functional>
-#include <typeindex>
-#include <thread>
 #include <mutex>
-#include <condition_variable>
-#include <atomic>
 #include <memory>
+
+class EventDispatcherTester;
 
 namespace Lithe {
 
 	template<typename E>
-	concept IsEvent = std::is_base_of<Event, E>::value;
+	concept IsEvent = std::is_base_of_v<Event, E>;
 
 
 
-	class EventDispatcher {
-
-		friend class EventDispatcherTest;
+	class LITHE_EXPORT EventDispatcher {
+		friend class ::EventDispatcherTester;
 
 		private:
 
@@ -37,8 +33,9 @@ namespace Lithe {
 			struct EventWrapper: public EventWrapperBase {
 			
 				public:
-			
-					explicit EventWrapper(E event): mEvent(std::move(event)) { }
+					
+					template <typename... Args>
+					explicit EventWrapper(Args&&... args): mEvent(std::forward<Args>(args)...) { }
 					void dispatch(EventDispatcher& dispatcher) const override {
 						dispatcher.dispatch(mEvent);
 					}
@@ -76,11 +73,11 @@ namespace Lithe {
 			}
 
 			// Enqueue an event for processing
-			template<typename E>
+			template<typename E, typename... Args>
 			requires IsEvent<E>
-			void enqueue(const E& event) {
+			void enqueue(Args&&... args) {
 				std::lock_guard<std::mutex> lock(mQueueMutex);
-				mEventQueue.push(std::make_shared<EventWrapper<E>>(event));
+				mEventQueue.emplace(std::make_shared<EventWrapper<E>>(std::forward<Args>(args)...));
 			}
 
 			void processQueue() {
@@ -88,9 +85,9 @@ namespace Lithe {
 					std::shared_ptr<EventWrapperBase> event;
 					{
 						std::lock_guard<std::mutex> lock(mQueueMutex);
-						if (mEventQueue.empty()) {
+						if (mEventQueue.empty())
 							break;
-						}
+
 						event = std::move(mEventQueue.front());
 						mEventQueue.pop();
 					}
@@ -99,7 +96,7 @@ namespace Lithe {
 			}
 
 
-		public:
+		private:
 
 			// Immediate dispatch of an event (thread-safe)
 			template<typename E>

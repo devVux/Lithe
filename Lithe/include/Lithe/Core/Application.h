@@ -1,48 +1,48 @@
 #pragma once
 
+#include "Utils.h"
+#include "Window.h"
+#include "Scene.h"
 #include "Renderer.h"
-#include "Lithe/Core/Window.h"
-#include "Lithe/Events/EventDispatcher.h"
-
-#include "Lithe/Scene/Scene.h"
-
+#include "EventDispatcher.h"
 
 namespace Lithe {
 
-	class Application {
+class LITHE_EXPORT Application {
 
-		public:
+	public:
 
-			Application(EventDispatcher& dispatcher): mDispatcher(dispatcher) {
-				std::cout << "Application created\n";
-			}
+		Application(SharedPtr<EventDispatcher> dispatcher): pDispatcher(dispatcher) {
+			std::cout << "Application created\n";
+		}
 			
-			virtual ~Application() {
-				stop();
-				std::cout << "Application destroyed\n";
-			}
+		virtual ~Application() {
+			stop();
+			std::cout << "Application destroyed\n";
+		}
 
-			void init();
+		void init();
 
-			void start() { mRunning = true; }
-			void stop() { mRunning = false; }
-			void run();
+		void start() { mRunning = true; }
+		void stop() { mRunning = false; }
+		void run();
 
 
-		private:
+	private:
 
-			Renderer mRenderer; 
-			std::shared_ptr<Window> pWindow { nullptr };
+		Renderer mRenderer; 
+		SharedPtr<Window> pWindow { nullptr };
 
-			EventDispatcher& mDispatcher;
+		SharedPtr<EventDispatcher> pDispatcher;
 
-			SceneManager mSceneManager;
+		SceneManager mSceneManager;
 
-			bool mRunning { false };
+		bool mRunning { false };
 
 	};
 	
+	typedef Application* (*ApplicationCreateFunc)(SharedPtr<EventDispatcher> dispatcher);
 
-	extern Application* create(EventDispatcher&);
+	LITHE_EXPORT void start(ApplicationCreateFunc createFunc);
 
 }

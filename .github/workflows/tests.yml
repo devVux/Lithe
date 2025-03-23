@@ -1,0 +1,31 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [master, dev, actions]
+  pull_request:
+    branches: [master, dev]
+  workflow_dispatch:
+
+
+jobs:
+  tests-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install vcpkg
+        run: |
+          ./vendor/vcpkg/bootstrap-vcpkg.bat
+
+      - name: Configure CMake
+        run: cmake --preset vs2022-debug -DLITHE_BUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build --preset vs2022-debug
+
+      - name: Test
+        run: .\out\build\vs2022\debug\bin\Testing.exe

@@ -1,47 +1,55 @@
 #pragma once
 
-#include <LLGL/LLGL.h>
-#include <LLGL/Types.h>
-#include <Lithe/Events/EventDispatcher.h>
+#include "Utils.h"
+#include "InternalTypes.h"
+#include "EventDispatcher.h"
 
-class GLFWwindow;
+#include <string>
 
 namespace Lithe {
+	class EventDispatcher;
 
-	class Window: public LLGL::Surface {
-		
+	class Window {
+
 		public:
+			
 
-			Window(EventDispatcher& dispatcher, const LLGL::Extent2D& size, const char* title):
-				pWindow(CreateGLFWWindow()), mTitle(title), mSize(size), mDispatcher(dispatcher) {
-				init(dispatcher);
-			}
-			virtual ~Window();
+			Window(SharedPtr<EventDispatcher> dispatcher, std::string title = "Simple Window", Size size = { 800, 600 }, Pos position = { 0, 0 }, bool centered = true);
+			Window(const Window& other) = delete;
+			Window(Window&&) = delete;
+			Window& operator=(const Window&) = delete;
+			Window& operator=(Window&&) = delete;
+			~Window();
 
-			virtual bool GetNativeHandle(void* nativeHandle, std::size_t nativeHandleSize)  override;
-			virtual bool AdaptForVideoMode(LLGL::Extent2D* resolution, bool* fullscreen) override;
-			virtual void ResetPixelFormat() override;
+			
+			void processEvents() const;
+			void show() const;
+			void hide() const;
+			void resize(Size size);
+			void move(Pos pos);
+			void rename(const std::string& title);
 
-			virtual LLGL::Display* FindResidentDisplay() const override { return LLGL::Display::GetPrimary(); }
-			LLGL::Extent2D GetContentSize() const override { return mSize; }
 
-			void* native() const { return pWindow; }
+			[[nodiscard]] NativeWindowHandle handle() const { return pNativeHandle; }
+			[[nodiscard]] Size size() const;
+			[[nodiscard]] Size screenSize() const;
+			[[nodiscard]] Size position() const;
+			[[nodiscard]] std::string title() const;
+			[[nodiscard]] bool shouldClose() const;
+							
+
+			#ifdef _WIN32
+				void dispatchEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
+			#elif defined(__APPLE__)
+				void dispatchEvent(NSNotificationName eventType, id sender);
+			#else
+			#endif
 
 		private:
 
-			void init(EventDispatcher& dispatcher);
-
-			GLFWwindow* CreateGLFWWindow();
-
-
-		private:
-
-			LLGL::Extent2D mSize;
-			std::string mTitle;
-
-			GLFWwindow* pWindow { nullptr };
-			EventDispatcher& mDispatcher;
-
+			SharedPtr<EventDispatcher> pDispatcher;
+			NativeWindowHandle pNativeHandle;
+			bool mCentered;
 
 	};
 

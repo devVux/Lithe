@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Lithe/Core/Clock.h"
+#include "Clock.h"
 #include <glm/glm.hpp>
 
 namespace Lithe {
@@ -8,6 +8,8 @@ namespace Lithe {
 	class Camera {
 
 		public:
+
+			virtual ~Camera() = default;
 
 			virtual void update(const Time::Timestep ts) = 0;
 

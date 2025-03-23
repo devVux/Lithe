@@ -34,7 +34,7 @@ class Entity {
 
 		entt::entity id() const { return mHandle.entity(); }
 
-		bool operator<=>(const Entity& other) const { return mHandle == other.mHandle; }
+		//bool operator<=>(const Entity& other) const { return mHandle == other.mHandle; }
 
 	private:
 

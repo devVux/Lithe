@@ -64,8 +64,8 @@ namespace Lithe {
 
 
 
-	void Window::init(EventDispatcher& dispatcher) {
-		glfwSetWindowUserPointer(pWindow, reinterpret_cast<void*>(&dispatcher));
+	void Window::init(EventDispatcher* dispatcher) {
+		glfwSetWindowUserPointer(pWindow, reinterpret_cast<void*>(dispatcher));
 
 		glfwSetKeyCallback(pWindow, onKeyCallback);
 		glfwSetMouseButtonCallback(pWindow, onMouseButtonCallback);
@@ -83,15 +83,7 @@ namespace Lithe {
 	bool Lithe::Window::GetNativeHandle(void* nativeHandle, std::size_t nativeHandleSize) {
 		if (nativeHandle != nullptr && nativeHandleSize == sizeof(LLGL::NativeHandle)) {
 			auto* handle = reinterpret_cast<LLGL::NativeHandle*>(nativeHandle);
-			
-			#if defined(__APPLE__)
-				handle->responder = glfwGetCocoaWindow(pWindow);
-			#elif defined(_WIN32)
-				handle->window = glfwGetWin32Window(pWindow);
-			#elif defined(__linux__)
-				handle->window = glfwGetX11Window(pWindow);
-			#endif
-
+			handle->window = glfwGetX11Window(pWindow);
 			return true;
 		}
 		return false;
@@ -110,8 +102,8 @@ namespace Lithe {
 	
 	GLFWwindow* Window::CreateGLFWWindow() {
 		auto window = glfwCreateWindow(mSize.width, mSize.height, mTitle.c_str(), nullptr, nullptr);
-		if (!window)
-			Lithe::Log::FATAL("Could not create the window");
+		if (!window) {}
+			// Lithe::Log::FATAL("Could not create the window");
 
 		return window;
 	}

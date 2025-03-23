@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "PerspectiveCamera.h"
 
-#include "Lithe/Events/Input.h"
+#include "Input.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -18,22 +18,21 @@ namespace Lithe {
 	void PerspectiveCamera::update(const Time::Timestep ts) {
 
 		using Lithe::Input;
-		using Lithe::Keys;
 
 		{
-			if (Input::isKeyDown(Keys::W))
+			if (Input::isKeyDown(Key::W))
 				mView = glm::translate(mView, glm::vec3(0, 0, mSpeed * ts));
-			if (Input::isKeyDown(Keys::S))
+			if (Input::isKeyDown(Key::S))
 				mView = glm::translate(mView, glm::vec3(0, 0, -mSpeed * ts));
 
-			if (Input::isKeyDown(Keys::A))
+			if (Input::isKeyDown(Key::A))
 				mView = glm::translate(mView, glm::vec3(mSpeed * ts, 0, 0));
-			if (Input::isKeyDown(Keys::D))
+			if (Input::isKeyDown(Key::D))
 				mView = glm::translate(mView, glm::vec3(-mSpeed * ts, 0, 0));
 
-			if (Input::isKeyDown(Keys::Q))
+			if (Input::isKeyDown(Key::Q))
 				mView = glm::rotate(mView, mSpeed * (float) ts, glm::vec3(0, mSpeed * ts, 0));
-			if (Input::isKeyDown(Keys::E))
+			if (Input::isKeyDown(Key::E))
 				mView = glm::rotate(mView, mSpeed * (float) ts, glm::vec3(0, -mSpeed * ts, 0));
 	
 		}

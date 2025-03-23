@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Lithe/Core/Log.h"
-#include "Lithe/Core/Clock.h"
-#include "Lithe/Scene/Entity.h"
-#include "Lithe/Scene/Camera.h"
+#include "Log.h"
+#include "Entity.h"
+#include "Camera.h"
+#include "Clock.h"
 
 #include <memory>
 

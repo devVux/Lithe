@@ -8,3 +8,6 @@
 [submodule "vendor/llgl"]
 	path = vendor/llgl
 	url = https://github.com/LukasBanana/LLGL.git
+[submodule "vendor/SoutienFlow"]
+	path = vendor/SoutienFlow
+	url = https://github.com/devVux/SoutienFlow.git

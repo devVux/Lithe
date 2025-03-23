@@ -1,15 +1,14 @@
 #include "pch.h"
 #include "Application.h"
 
-#include "Lithe/Core/Log.h"
-#include "Lithe/Core/Clock.h"
-#include "Lithe/Events/Event.h"
-#include "Lithe/Events/Input.h"
+#include "Clock.h"
+#include "Input.h"
+#include "Components.h"
+#include "WindowEvents.h"
+#include "OrthographicCamera.h"
 
-#include "Lithe/Scene/OrthographicCamera.h"
-#include "Lithe/Scene/Components.h"
-
-#include <Utils/Utils.h>
+#include <LLGL/LLGL.h>
+#include <LLGL/RenderSystemFlags.h>
 
 #include <glm/ext/matrix_transform.hpp>
 
@@ -17,19 +16,12 @@
 namespace Lithe {
 
 	void Application::init() {
-		LLGL::RenderSystemDescriptor rendererDesc;
-		rendererDesc.moduleName = MODULE_NAME;
 
-		if (!glfwInit())
-			Lithe::Log::ERR("Could not load GLFW");
+		pWindow = makeShared<Lithe::Window>(pDispatcher, "Main window", Size(1200, 800));
+		Input::setWindow(pWindow);
+		mRenderer.init(pWindow);
 
-		pWindow = makeShared<Lithe::Window>(mDispatcher, LLGL::Extent2D(1200, 800), "Main window");
-		mRenderer.init(pWindow, rendererDesc);
-
-		Input::setInput(pWindow.get());
-
-		
-		mDispatcher.subscribe<WindowEvents::WindowCloseEvent>([this](const WindowEvents::WindowCloseEvent& e) {
+		pDispatcher->subscribe<WindowEvents::WindowClosedEvent>([this](const WindowEvents::WindowClosedEvent& e) {
 			stop();
 		});
 
@@ -61,7 +53,7 @@ namespace Lithe {
 
 			mRenderer.draw(*mSceneManager.active(), mSceneManager.activeCamera().get());
 
-			pWindow->ProcessEvents();
+			pWindow->processEvents();
 		}
 
 

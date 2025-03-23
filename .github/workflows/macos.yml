@@ -1,0 +1,52 @@
+name: macOS CI
+
+on:
+  push:
+    branches: [ master, dev, actions ]
+  pull_request:
+    branches: [ master, dev ]
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [debug, release]
+        include:
+          - config: debug
+            preset: macos-debug
+            build_preset: macos-debug
+          - config: release
+            preset: macos-release
+            build_preset: macos-release
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: macos-${{ matrix.config }}
+
+    - name: Install dependencies
+      run: |
+        brew install cmake ninja
+        ./vendor/vcpkg/bootstrap-vcpkg.sh
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.preset }}
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.build_preset }}
+
+    - name: Cache vcpkg
+      uses: actions/cache@v3
+      with:
+        path: ./vendor/vcpkg/installed
+        key: vcpkg-macos-${{ hashFiles('**/vcpkg.json') }}
+        restore-keys: vcpkg-macos-
