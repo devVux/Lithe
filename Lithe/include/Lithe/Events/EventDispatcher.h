@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Export.h>
 #include <Event.h>
 #include <Log.h>
 
@@ -18,7 +19,7 @@ namespace Lithe {
 
 
 
-	class EventDispatcher {
+	class LITHE_EXPORT EventDispatcher {
 		friend class ::EventDispatcherTester;
 
 		private:
