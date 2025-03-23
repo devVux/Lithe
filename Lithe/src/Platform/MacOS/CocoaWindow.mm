@@ -196,7 +196,7 @@ void Window::resize(Size size) {
     }
 }
 
-Window::Size Window::size() const {
+Size Window::size() const {
     @autoreleasepool {
         NSWindow* window = (__bridge NSWindow*) pNativeHandle;
         NSRect contentRect = [[window contentView] frame];
@@ -216,7 +216,7 @@ void Window::move(Window::Pos pos) {
     }
 }
 
-Window::Size Window::position() const {
+Size Window::position() const {
     @autoreleasepool {
         NSWindow* window = (__bridge NSWindow*) pNativeHandle;
         NSRect screenRect = [[NSScreen mainScreen] frame];
@@ -228,7 +228,7 @@ Window::Size Window::position() const {
     }
 }
 
-Window::Size Window::screenSize() const {
+Size Window::screenSize() const {
     @autoreleasepool {
         NSRect screenRect = [[NSScreen mainScreen] frame];
         return {static_cast<long>(screenRect.size.width), static_cast<long>(screenRect.size.height)};
