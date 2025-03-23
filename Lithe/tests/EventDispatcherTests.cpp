@@ -17,7 +17,7 @@ struct AnotherTestEvent: public Lithe::Event {
 struct YetAnotherTestEvent: public Lithe::Event { };
 
 // Test fixture
-class EventDispatcherTest: public ::testing::Test {
+class EventDispatcherTester: public ::testing::Test {
 	
 	protected:
 
@@ -33,39 +33,40 @@ class EventDispatcherTest: public ::testing::Test {
 
 };
 
+namespace EventTypeIdGeneration {
 
+	TEST_F(EventDispatcherTester, EventTypeIdConsistency) {
+		auto id1 = getEventTypeIdForTest<TestEvent>();
+		auto id2 = getEventTypeIdForTest<AnotherTestEvent>();
+		auto id3 = getEventTypeIdForTest<YetAnotherTestEvent>();
+		auto id4 = getEventTypeIdForTest<TestEvent>();  // Should be same as id1
 
-TEST_F(EventDispatcherTest, EventTypeIdConsistency) {
-	auto id1 = getEventTypeIdForTest<TestEvent>();
-	auto id2 = getEventTypeIdForTest<AnotherTestEvent>();
-	auto id3 = getEventTypeIdForTest<YetAnotherTestEvent>();
-	auto id4 = getEventTypeIdForTest<TestEvent>();  // Should be same as id1
+		EXPECT_NE(id1, id2);
+		EXPECT_NE(id1, id3);
+		EXPECT_NE(id2, id3);
 
-	EXPECT_NE(id1, id2);
-	EXPECT_NE(id1, id3);
-	EXPECT_NE(id2, id3);
+		EXPECT_EQ(id1, id4);
+	}
 
-	EXPECT_EQ(id1, id4);
+	TEST_F(EventDispatcherTester, EventTypeIdConsistencyAcrossInvocations) {
+		auto id1 = getEventTypeIdForTest<TestEvent>();
+		auto id2 = getEventTypeIdForTest<AnotherTestEvent>();
+
+		auto id3 = getEventTypeIdForTest<TestEvent>();
+		auto id4 = getEventTypeIdForTest<AnotherTestEvent>();
+
+		EXPECT_EQ(id1, id3);
+		EXPECT_EQ(id2, id4);
+	}
+
+	TEST_F(EventDispatcherTester, DifferentEventTypeIds) {
+		auto id1 = getEventTypeIdForTest<TestEvent>();
+		auto id2 = getEventTypeIdForTest<AnotherTestEvent>();
+		auto id3 = getEventTypeIdForTest<YetAnotherTestEvent>();
+
+		EXPECT_NE(id1, id2);
+		EXPECT_NE(id1, id3);
+		EXPECT_NE(id2, id3);
+	}
+
 }
-
-TEST_F(EventDispatcherTest, EventTypeIdConsistencyAcrossInvocations) {
-	auto id1 = getEventTypeIdForTest<TestEvent>();
-	auto id2 = getEventTypeIdForTest<AnotherTestEvent>();
-
-	auto id3 = getEventTypeIdForTest<TestEvent>();
-	auto id4 = getEventTypeIdForTest<AnotherTestEvent>();
-
-	EXPECT_EQ(id1, id3);
-	EXPECT_EQ(id2, id4);
-}
-
-TEST_F(EventDispatcherTest, DifferentEventTypeIds) {
-	auto id1 = getEventTypeIdForTest<TestEvent>();
-	auto id2 = getEventTypeIdForTest<AnotherTestEvent>();
-	auto id3 = getEventTypeIdForTest<YetAnotherTestEvent>();
-
-	EXPECT_NE(id1, id2);
-	EXPECT_NE(id1, id3);
-	EXPECT_NE(id2, id3);
-}
-
