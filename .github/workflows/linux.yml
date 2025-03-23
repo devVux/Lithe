@@ -23,9 +23,10 @@ jobs:
             build_preset: linux-release
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
+        fetch-depth: 0
 
     - name: Install dependencies
       run: |
