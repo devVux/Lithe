@@ -1,7 +1,11 @@
 #include "pch.h"
 #include "Window.h"
+
 #include "Log.h"
 #include "Event.h"
+#include "WindowEvents.h"
+#include "KeyEvents.h"
+#include "MouseEvents.h"
 #include "EventDispatcher.h"
 
 #include <Cocoa/Cocoa.h>
@@ -204,7 +208,7 @@ Size Window::size() const {
     }
 }
 
-void Window::move(Window::Pos pos) {
+void Window::move(Pos pos) {
     @autoreleasepool {
         NSWindow* window = (__bridge NSWindow*) pNativeHandle;
         NSRect screenRect = [[NSScreen mainScreen] frame];
