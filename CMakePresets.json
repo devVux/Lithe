@@ -1,0 +1,226 @@
+{
+	"version": 6,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 23,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"hidden": true,
+			"name": "_base",
+			"description": "Base config",
+			"binaryDir": "${sourceDir}/build",
+			"installDir": "${sourceDir}/install",
+			"toolchainFile": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
+		},
+
+		{
+			"hidden": true,
+			"name": "_windows",
+			"description": "Windows base config",
+			"inherits": "_base",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"hidden": true,
+			"name": "_linux",
+			"description": "Linux base config",
+			"inherits": "_base",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"hidden": true,
+			"name": "_macos",
+			"description": "MacOS base config",
+			"inherits": "_base",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Darwin"
+			}
+		},
+
+
+		{
+			"hidden": true,
+			"name": "_msvc",
+			"generator": "Visual Studio 17 2022"
+		},
+
+		{
+			"hidden": true,
+			"name": "_ninja-multi",
+			"generator": "Ninja Multi-Config",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+			}
+		},
+		{
+			"hidden": true,
+			"name": "_ninja",
+			"generator": "Ninja",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+			}
+		},
+		{
+			"hidden": true,
+			"name": "_make",
+			"generator": "Unix Makefiles",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+			}
+		},
+
+		{
+			"hidden": true,
+			"name": "_xcode",
+			"generator": "Xcode"
+		},
+
+
+		{
+			"hidden": true,
+			"name": "_debug",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"hidden": true,
+			"name": "_release",
+			"binaryDir": "${sourceDir}/build/release",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+
+
+		{
+			"name": "windows-msvc",
+			"inherits": ["_windows", "_msvc"]
+		},
+		{
+			"name": "windows-ninja-multi",
+			"inherits": ["_windows", "_ninja-multi"]
+		},
+		{
+			"name": "windows-ninja-dbg",
+			"inherits": ["_windows", "_ninja", "_debug"],
+			"binaryDir": "${sourceDir}/build/debug"
+		},
+		{
+			"name": "windows-ninja-rel",
+			"inherits": ["_windows", "_ninja", "_release"],
+			"binaryDir": "${sourceDir}/build/debug"
+		},
+
+
+		{
+			"name": "linux-ninja-multi",
+			"inherits": ["_linux", "_ninja-multi"]
+		},
+		{
+			"name": "linux-ninja-dbg",
+			"inherits": ["_linux", "_ninja", "_debug"],
+			"binaryDir": "${sourceDir}/build/debug"
+		},
+		{
+			"name": "linux-ninja-rel",
+			"inherits": ["_linux", "_ninja", "_release"],
+			"binaryDir": "${sourceDir}/build/debug"
+		},
+		{
+			"name": "linux-make-dbg",
+			"inherits": ["_linux", "_make", "_debug"],
+			"binaryDir": "${sourceDir}/build/debug"
+		},
+		{
+			"name": "linux-make-rel",
+			"inherits": ["_linux", "_make", "_release"],
+			"binaryDir": "${sourceDir}/build/debug"
+		}
+
+	],
+	"buildPresets": [
+		{
+			"name": "windows-msvc-dbg",
+			"displayName": "Windows MSVC Debug",
+			"configurePreset": "windows-msvc",
+			"configuration": "Debug"
+		},
+		{
+			"name": "windows-msvc-rel",
+			"displayName": "Windows MSVC Release",
+			"configurePreset": "windows-msvc",
+			"configuration": "Release"
+		},
+		{
+			"name": "windows-ninja-multi-dbg",
+			"displayName": "Windows Ninja Multi-Config Debug",
+			"configurePreset": "windows-ninja-multi",
+			"configuration": "Debug"
+		},
+		{
+			"name": "windows-ninja-multi-rel",
+			"displayName": "Windows Ninja Multi-Config Release",
+			"configurePreset": "windows-ninja-multi",
+			"configuration": "Release"
+		},
+		{
+			"name": "windows-ninja-dbg",
+			"displayName": "Windows Ninja Debug",
+			"configurePreset": "windows-ninja-dbg"
+		},	
+		{
+			"name": "windows-ninja-rel",
+			"displayName": "Windows Ninja Release",
+			"configurePreset": "windows-ninja-rel"
+		},
+
+
+
+		{
+			"name": "linux-ninja-multi-dbg",
+			"displayName": "Linux Ninja Multi-Config Debug",
+			"configurePreset": "linux-ninja-multi",
+			"configuration": "Debug"
+		},
+		{
+			"name": "linux-ninja-multi-rel",
+			"displayName": "Linux Ninja Multi-Config Release",
+			"configurePreset": "linux-ninja-multi",
+			"configuration": "Release"
+		},
+		{
+			"name": "linux-ninja-dbg",
+			"displayName": "Linux Ninja Debug",
+			"configurePreset": "linux-ninja-dbg"
+		},	
+		{
+			"name": "linux-ninja-rel",
+			"displayName": "Linux Ninja Release",
+			"configurePreset": "linux-ninja-rel"
+		},
+		{
+			"name": "linux-make-dbg",
+			"displayName": "Linux Make Debug",
+			"configurePreset": "linux-make-dbg"
+		},
+		{
+			"name": "linux-make-rel",
+			"displayName": "Linux Make Release",
+			"configurePreset": "linux-make-rel"
+		}
+
+	]
+}
