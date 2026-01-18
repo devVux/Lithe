@@ -9,6 +9,11 @@ add_library(Lithe INTERFACE)
 add_subdirectory("./src/Core/")
 #add_subdirectory("./src/Core/")
 
+if (${LITHE_BUILD_TESTS})
+	message("Testing enabled")
+	add_subdirectory("./src/Tests/")
+endif()
+
 target_link_libraries(Lithe 
 	INTERFACE 
 		Core
