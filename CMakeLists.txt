@@ -14,16 +14,14 @@ include(GNUInstallDirs)
 
 add_subdirectory(Lithe)
 add_subdirectory(Sandbox)
-# Platform-specific configuration
 #add_subdirectory(Editor)
 
 #enable_testing()
 #include(CTest)
-
-#add_custom_target(copy-compile-commands ALL
-#  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#    ${CMAKE_BINARY_DIR}/compile_commands.json
-#    ${CMAKE_SOURCE_DIR}/compile_commands.json
-#  DEPENDS ${CMAKE_BINARY_DIR}/compile_commands.json
-#  COMMENT "Copying compile_commands.json to source directory"
-#)
+add_custom_target(copy-compile-commands
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_BINARY_DIR}/compile_commands.json
+    ${CMAKE_SOURCE_DIR}/compile_commands.json
+  DEPENDS ${CMAKE_BINARY_DIR}/compile_commands.json
+  COMMENT "Copying compile_commands.json to source directory"
+)
