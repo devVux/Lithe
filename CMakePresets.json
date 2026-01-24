@@ -10,11 +10,8 @@
 			"hidden": true,
 			"name": "_base",
 			"description": "Base config",
-			"binaryDir": "${sourceDir}/build",
-			"installDir": "${sourceDir}/install",
 			"toolchainFile": "${sourceDir}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake"
 		},
-
 		{
 			"hidden": true,
 			"name": "_windows",
@@ -48,46 +45,48 @@
 				"rhs": "Darwin"
 			}
 		},
-
-
 		{
 			"hidden": true,
 			"name": "_msvc",
-			"generator": "Visual Studio 17 2022"
-		},
-
-		{
-			"hidden": true,
-			"name": "_ninja-multi",
-			"generator": "Ninja Multi-Config",
+			"generator": "Visual Studio 17 2022",
+			"binaryDir": "${sourceDir}/build/msvc",
+			"installDir": "${sourceDir}/install/msvc",
 			"cacheVariables": {
-				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+				"binaryDir": "${sourceDir}/install/msvc"
 			}
 		},
 		{
 			"hidden": true,
 			"name": "_ninja",
 			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/build/ninja/${presetName}",
+			"installDir": "${sourceDir}/install/ninja/${presetName}",
 			"cacheVariables": {
-				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/install/ninja/${presetName}"
+			}
+		},
+		{
+			"hidden": true,
+			"name": "_ninja-multi",
+			"generator": "Ninja Nulti-Nonfig",
+			"binaryDir": "${sourceDir}/build/ninja-multi/${presetName}",
+			"installDir": "${sourceDir}/install/ninja-multi/${presetName}",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "on",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/install/ninja-multi"
 			}
 		},
 		{
 			"hidden": true,
 			"name": "_make",
 			"generator": "Unix Makefiles",
+			"binaryDir": "${sourceDir}/build/make/${presetName}",
 			"cacheVariables": {
-				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/install/make/${presetName}"
 			}
 		},
-
-		{
-			"hidden": true,
-			"name": "_xcode",
-			"generator": "Xcode"
-		},
-
-
 		{
 			"hidden": true,
 			"name": "_debug",
@@ -98,58 +97,79 @@
 		{
 			"hidden": true,
 			"name": "_release",
-			"binaryDir": "${sourceDir}/build/release",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release"
 			}
 		},
-
-
 		{
 			"name": "windows-msvc",
-			"inherits": ["_windows", "_msvc"]
+			"inherits": [
+				"_windows",
+				"_msvc"
+			]
 		},
 		{
 			"name": "windows-ninja-multi",
-			"inherits": ["_windows", "_ninja-multi"]
+			"inherits": [
+				"_windows",
+				"_ninja-multi"
+			]
 		},
 		{
 			"name": "windows-ninja-dbg",
-			"inherits": ["_windows", "_ninja", "_debug"],
-			"binaryDir": "${sourceDir}/build/debug"
+			"inherits": [
+				"_windows",
+				"_ninja",
+				"_debug"
+			]
 		},
 		{
 			"name": "windows-ninja-rel",
-			"inherits": ["_windows", "_ninja", "_release"],
-			"binaryDir": "${sourceDir}/build/debug"
+			"inherits": [
+				"_windows",
+				"_ninja",
+				"_release"
+			]
 		},
-
-
 		{
 			"name": "linux-ninja-multi",
-			"inherits": ["_linux", "_ninja-multi"]
+			"inherits": [
+				"_linux",
+				"_ninja-multi"
+			]
 		},
 		{
 			"name": "linux-ninja-dbg",
-			"inherits": ["_linux", "_ninja", "_debug"],
-			"binaryDir": "${sourceDir}/build/debug"
+			"inherits": [
+				"_linux",
+				"_ninja",
+				"_debug"
+			]
 		},
 		{
 			"name": "linux-ninja-rel",
-			"inherits": ["_linux", "_ninja", "_release"],
-			"binaryDir": "${sourceDir}/build/debug"
+			"inherits": [
+				"_linux",
+				"_ninja",
+				"_release"
+			]
 		},
 		{
 			"name": "linux-make-dbg",
-			"inherits": ["_linux", "_make", "_debug"],
-			"binaryDir": "${sourceDir}/build/debug"
+			"inherits": [
+				"_linux",
+				"_make",
+				"_debug"
+			]
 		},
 		{
 			"name": "linux-make-rel",
-			"inherits": ["_linux", "_make", "_release"],
-			"binaryDir": "${sourceDir}/build/debug"
+			"inherits": [
+				"_linux",
+				"_make",
+				"_release"
+			]
 		}
-
 	],
 	"buildPresets": [
 		{
@@ -180,15 +200,12 @@
 			"name": "windows-ninja-dbg",
 			"displayName": "Windows Ninja Debug",
 			"configurePreset": "windows-ninja-dbg"
-		},	
+		},
 		{
 			"name": "windows-ninja-rel",
 			"displayName": "Windows Ninja Release",
 			"configurePreset": "windows-ninja-rel"
 		},
-
-
-
 		{
 			"name": "linux-ninja-multi-dbg",
 			"displayName": "Linux Ninja Multi-Config Debug",
@@ -205,7 +222,7 @@
 			"name": "linux-ninja-dbg",
 			"displayName": "Linux Ninja Debug",
 			"configurePreset": "linux-ninja-dbg"
-		},	
+		},
 		{
 			"name": "linux-ninja-rel",
 			"displayName": "Linux Ninja Release",
@@ -221,6 +238,5 @@
 			"displayName": "Linux Make Release",
 			"configurePreset": "linux-make-rel"
 		}
-
 	]
 }
