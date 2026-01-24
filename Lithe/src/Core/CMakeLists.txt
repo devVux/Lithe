@@ -7,14 +7,12 @@ set(LT_CORE_INCLUDE_DIR "${LITHE_INCLUDE_DIR}/Lithe/Core")
 
 add_library(Core STATIC)
 
-find_package(spdlog)
+find_package(spdlog REQUIRED)
 
 target_compile_definitions(Core 
 	PRIVATE
-		$<$<CONFIG:Debug>:LOG_DIR="${CMAKE_BINARY_DIR}">
-		$<$<CONFIG:Release>:LOG_DIR="${CMAKE_INSTALL_PREFIX}">
+		LOG_DIR="${CMAKE_BINARY_DIR}"
 )
-message("Log dir ${LOG_DIR}")
 
 target_sources(Core
     PRIVATE
