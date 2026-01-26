@@ -69,9 +69,6 @@ target_sources(Renderer
 	  FILES
 		"${LT_RENDERER_INCLUDE_DIR}/ForwardDecls.hpp"
 		"${LT_RENDERER_INCLUDE_DIR}/RenderSystem.hpp"
-		"${LT_RENDERER_INCLUDE_DIR}/Renderer.hpp"
-		"${LT_RENDERER_INCLUDE_DIR}/RenderCache.hpp"
-		"${LT_RENDERER_INCLUDE_DIR}/RenderPacket.hpp"
 )
 
 add_dependencies(Renderer Shaders)
