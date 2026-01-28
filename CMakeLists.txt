@@ -7,8 +7,6 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(LITHE_BUILD_TESTS OFF)
-
 
 include(CheckIncludeFileCXX)
 include(GenerateExportHeader)
@@ -16,7 +14,6 @@ include(GNUInstallDirs)
 
 add_subdirectory(Lithe)
 add_subdirectory(Sandbox)
-#add_subdirectory(Editor)
 
 add_custom_target(copy-compile-commands
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
