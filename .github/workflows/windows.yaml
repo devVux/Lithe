@@ -1,0 +1,52 @@
+name: Windows CI
+on:
+  push:
+    branches: [ master, dev, actions ]
+  pull_request:
+    branches: [ master, dev ]
+  workflow_dispatch:
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [MSVC, clang]
+        config: [debug, release]
+        include:
+          - compiler: MSVC
+            config: debug
+            configure_preset: windows-MSVC
+            build_preset: windows-MSVC-debug
+          - compiler: MSVC
+            config: release
+            configure_preset: windows-MSVC
+            build_preset: windows-MSVC-release
+          - compiler: clang
+            config: debug
+            configure_preset: windows-clang
+            build_preset: windows-clang-debug
+          - compiler: clang
+            config: release
+            configure_preset: windows-clang
+            build_preset: windows-clang-release
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+    - name: Setup MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+    - name: Install LLVM/Clang
+      if: matrix.compiler == 'clang'
+      uses: KyleMayes/install-llvm-action@v2
+      with:
+        version: "18.1.8"
+    - name: Install Ninja
+      run: choco install ninja -y
+    - name: Bootstrap vcpkg
+      run: ./vendor/vcpkg/bootstrap-vcpkg.bat
+    - name: Configure
+      run: cmake --preset ${{ matrix.configure_preset }}
+    - name: Build
+      run: cmake --build --preset ${{ matrix.build_preset }}
