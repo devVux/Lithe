@@ -7,8 +7,8 @@
   },
   "configurePresets": [
     {
-      "name": "windows-MSVC",
-      "displayName": "Windows (MSVC)",
+      "name": "windows-msvc",
+      "displayName": "Windows (msvc)",
       "generator": "Ninja Multi-Config",
       "binaryDir": "${sourceDir}/out/build/windows/msvc",
       "installDir": "${sourceDir}/out/install/windows/msvc",
@@ -69,15 +69,15 @@
   ],
   "buildPresets": [
     {
-      "name": "windows-MSVC-debug",
-      "displayName": "Windows MSVC Debug",
-      "configurePreset": "windows-MSVC",
+      "name": "windows-msvc-debug",
+      "displayName": "Windows msvc Debug",
+      "configurePreset": "windows-msvc",
       "configuration": "Debug"
     },
     {
-      "name": "windows-MSVC-release",
-      "displayName": "Windows MSVC Release",
-      "configurePreset": "windows-MSVC",
+      "name": "windows-msvc-release",
+      "displayName": "Windows msvc Release",
+      "configurePreset": "windows-msvc",
       "configuration": "Release"
     },
     {
