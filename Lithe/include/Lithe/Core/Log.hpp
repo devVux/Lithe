@@ -2,9 +2,6 @@
 
 #include <expected>
 #include <memory>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/rotating_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #include <string>
 
@@ -38,7 +35,7 @@ class Logger {
 #define LT_LOG_FATAL(...)                                   \
 	{                                                       \
 		Lithe::Logger::coreLogger()->critical(__VA_ARGS__); \
-		return 1;                                           \
+		return false;                                           \
 	}
 
 } // namespace Lithe

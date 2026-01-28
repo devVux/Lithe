@@ -16,7 +16,7 @@ class RenderSystem {
 public:
 
 	~RenderSystem() noexcept;
-	std::optional<int> init(ISurface&, std::set<Extension> = {});
+	bool init(ISurface&, std::set<Extension> = {});
 
 	void render();
 

@@ -3,7 +3,7 @@
 #include <functional>
 #include <utility>
 
-namespace Lithe {
+namespace {
 
 #ifndef LT_USE_64_BIT_PTR_DEFINES
 #if defined(__LP64__) || defined(_WIN64) || (defined(__x86_64__) && !defined(__ILP32__)) || defined(_M_X64) || \
@@ -55,8 +55,8 @@ LT_DEFINE_NON_DISPATCHABLE_HANDLE(VkDescriptorPool)
 
 template<typename T, typename Deleter = std::function<void(T)>>
 struct RAIIed {
-	T		t;
-	Deleter deleter;
+	T		t {};
+	Deleter deleter {};
 
 	RAIIed() = default;
 

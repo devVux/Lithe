@@ -8,11 +8,16 @@
 #include <optional>
 #include <set>
 #include <vector>
+#include <algorithm>
+#include <cassert>
+
+
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
 #ifdef LT_WIN32
 #include <windows.h>
+#include <vulkan/vulkan_win32.h>
 #endif
 
 #ifdef LT_COCOA
@@ -28,6 +33,7 @@
 #include <vulkan/vulkan_wayland.h>
 #include <wayland-client.h>
 #endif
+
 
 struct Vertex {
 	float pos[3];
@@ -329,50 +335,44 @@ namespace {
 
 namespace {
 
-	std::expected<VkSurfaceKHR, Error> createSurface(
-		VkInstance instance,
-#ifdef LT_WIN32
-		HWND hwnd
-#elif defined(LT_COCOA)
-		void* layer
-#elif defined(LT_X11)
-		Display* display,
-		Window	 window
-#elif defined(LT_WAYLAND)
-		wl_display* display,
-		wl_surface* wlSurface
-#endif
-	) {
-		VkSurfaceKHR surface;
+	std::expected<VkSurfaceKHR, Error> createSurface(VkInstance instance, ISurface& surface) {
+		VkSurfaceKHR vkSurface;
 #ifdef LT_WIN32
 		VkWin32SurfaceCreateInfoKHR info = {};
 		info.sType						 = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 		info.hinstance					 = GetModuleHandle(NULL);
-		info.hwnd						 = hwnd;
-		return vkCreateWin32SurfaceKHR(instance, &info, nullptr, surface);
+		info.hwnd						 = static_cast<HWND>(surface.handle());
+		auto res = vkCreateWin32SurfaceKHR(instance, &info, nullptr, &vkSurface);
+		if (res != VK_SUCCESS)
+			return std::unexpected {Error::Unknown};
 #elif defined(LT_COCOA)
 		VkMetalSurfaceCreateInfoEXT info = {};
 		info.sType						 = VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT;
-		info.pLayer						 = layer;
-		return vkCreateMetalSurfaceEXT(instance, &info, nullptr, surface);
+		info.pLayer						 = static_cast<void*>(surface.handle();
+		auto res = vkCreateMetalSurfaceEXT(instance, &info, nullptr, vkSurface);
+		if (res != VK_SUCCESS)
+			return std::unexpected {Error::Unknown};
 #elif defined(LT_X11)
 		VkXlibSurfaceCreateInfoKHR info = {};
 		info.sType						= VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
-		info.dpy						= display;
-		info.window						= window;
-		if (vkCreateXlibSurfaceKHR(instance, &info, nullptr, &surface) != VK_SUCCESS)
+		info.dpy						= static_cast<Display*>(surface.display());
+		info.window						= static_cast<Window>(surface.handle());
+		auto res = vkCreateXlibSurfaceKHR(instance, &info, nullptr, &vkSurface);
+		if (res != VK_SUCCESS)
 			return std::unexpected {Error::Unknown};
 #elif defined(LT_WAYLAND)
 		VkWaylandSurfaceCreateInfoKHR info {
-			.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR, .display = display, .surface = wlSurface
+			.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR, 
+			.display = static_cast<wl_display*>(surface.display()), 
+			.surface = static_cast<wl_surface*>(surface.handle()), 
 		};
 
-		auto res = vkCreateWaylandSurfaceKHR(instance, &info, nullptr, &surface);
+		auto res = vkCreateWaylandSurfaceKHR(instance, &info, nullptr, &vkSurface);
 		if (res != VK_SUCCESS)
 			return std::unexpected {Error::Unknown};
 #endif
 
-		return {surface};
+		return {vkSurface};
 	}
 
 } // namespace
@@ -405,7 +405,7 @@ namespace {
 	}
 
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, VkExtent2D size) {
-		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+		if (capabilities.currentExtent.width != UINT32_MAX)
 			return capabilities.currentExtent;
 
 		size.width	= std::clamp(size.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
@@ -714,11 +714,11 @@ RenderSystem::~RenderSystem() noexcept {
 	vkDeviceWaitIdle(mDevice);
 }
 
-std::optional<int> RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
+bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 
 	extensions.insert("VK_KHR_surface");
 
-#ifdef LT_DEBUG_MODE
+#ifdef LT_DEBUG
 	std::set<std::string> layers {"VK_LAYER_KHRONOS_validation"};
 
 	extensions.insert("VK_EXT_debug_utils");
@@ -748,9 +748,7 @@ std::optional<int> RenderSystem::init(ISurface& surface, std::set<Extension> ext
 	else
 		LT_LOG_FATAL("Could not create Vulkan instance");
 
-	auto surface2 = createSurface(
-		mInstance, static_cast<wl_display*>(surface.display()), static_cast<wl_surface*>(surface.handle())
-	);
+	auto surface2 = createSurface(mInstance, surface);
 
 	if (surface2)
 		mSurface =
@@ -951,7 +949,7 @@ std::optional<int> RenderSystem::init(ISurface& surface, std::set<Extension> ext
 		);
 	}
 
-	return std::nullopt;
+	return true;
 }
 
 void RenderSystem::render() {
