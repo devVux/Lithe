@@ -1,9 +1,6 @@
 
-vendor/
 vcpkg_installed/
-logs/
-build/
-install/
+out/
 
 
 
