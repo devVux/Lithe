@@ -14,7 +14,8 @@ CONFIG = {
                         "CMAKE_C_COMPILER": "cl",
                         "CMAKE_CXX_COMPILER": "cl",
                         "CMAKE_TOOLCHAIN_FILE": "./vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
-                        "VCPKG_MANIFEST_MODE": "ON"
+                        "VCPKG_MANIFEST_MODE": "ON",
+				        "VCPKG_TARGET_TRIPLET": "x64-windows"
                     }
                 },
                 "clang": {
@@ -22,7 +23,8 @@ CONFIG = {
                         "CMAKE_C_COMPILER": "clang-cl",
                         "CMAKE_CXX_COMPILER": "clang-cl",
                         "CMAKE_TOOLCHAIN_FILE": "./vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
-				        "VCPKG_MANIFEST_MODE": "ON"
+				        "VCPKG_MANIFEST_MODE": "ON",
+				        "VCPKG_TARGET_TRIPLET": "x64-windows"
                     }
                 }
             }
@@ -35,7 +37,8 @@ CONFIG = {
                         "CMAKE_C_COMPILER": "clang",
                         "CMAKE_CXX_COMPILER": "clang++",
                         "CMAKE_TOOLCHAIN_FILE": "./vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
-				        "VCPKG_MANIFEST_MODE": "ON"
+				        "VCPKG_MANIFEST_MODE": "ON",
+                        "VCPKG_TARGET_TRIPLET": "x64-linux"
                     }
                 }
             }
@@ -58,8 +61,8 @@ def generate_presets():
                 "name": preset_name,
                 "displayName": f"{platform.title()} ({compiler})",
                 "generator": CONFIG["generator"],
-                "binaryDir": f"${{sourceDir}}/out/build/{compiler.lower()}",
-                "installDir": f"${{sourceDir}}/out/install/{compiler.lower()}",
+                "binaryDir": f"${{sourceDir}}/out/build/{platform.lower()}/{compiler.lower()}",
+                "installDir": f"${{sourceDir}}/out/install/{platform.lower()}/{compiler.lower()}",
                 "condition": pdata["condition"],
                 "cacheVariables": {
                     **cdata["cacheVariables"],
@@ -72,7 +75,7 @@ def generate_presets():
                 build_name = f"{preset_name}-{build_type.lower()}"
                 build_presets.append({
                     "name": build_name,
-                    "displayName": f"{platform.title()} {compiler} ({build_type})",
+                    "displayName": f"{platform.title()} {compiler} {build_type}",
                     "configurePreset": preset_name,
                     "configuration": build_type
                 })

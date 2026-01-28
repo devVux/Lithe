@@ -10,8 +10,8 @@
       "name": "windows-MSVC",
       "displayName": "Windows (MSVC)",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/out/build/msvc/windows-MSVC",
-      "installDir": "${sourceDir}/out/install/msvc/windows-MSVC",
+      "binaryDir": "${sourceDir}/out/build/windows/msvc",
+      "installDir": "${sourceDir}/out/install/windows/msvc",
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -22,6 +22,7 @@
         "CMAKE_CXX_COMPILER": "cl",
         "CMAKE_TOOLCHAIN_FILE": "./vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_MANIFEST_MODE": "ON",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },
@@ -29,8 +30,8 @@
       "name": "windows-clang",
       "displayName": "Windows (clang)",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/out/build/clang/windows-clang",
-      "installDir": "${sourceDir}/out/install/clang/windows-clang",
+      "binaryDir": "${sourceDir}/out/build/windows/clang",
+      "installDir": "${sourceDir}/out/install/windows/clang",
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -41,6 +42,7 @@
         "CMAKE_CXX_COMPILER": "clang-cl",
         "CMAKE_TOOLCHAIN_FILE": "./vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_MANIFEST_MODE": "ON",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },
@@ -48,8 +50,8 @@
       "name": "linux-clang",
       "displayName": "Linux (clang)",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/out/build/clang/linux-clang",
-      "installDir": "${sourceDir}/out/install/clang/linux-clang",
+      "binaryDir": "${sourceDir}/out/build/linux/clang",
+      "installDir": "${sourceDir}/out/install/linux/clang",
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -60,6 +62,7 @@
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_TOOLCHAIN_FILE": "./vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_MANIFEST_MODE": "ON",
+        "VCPKG_TARGET_TRIPLET": "x64-linux",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     }
@@ -67,37 +70,37 @@
   "buildPresets": [
     {
       "name": "windows-MSVC-debug",
-      "displayName": "Windows MSVC (Debug)",
+      "displayName": "Windows MSVC Debug",
       "configurePreset": "windows-MSVC",
       "configuration": "Debug"
     },
     {
       "name": "windows-MSVC-release",
-      "displayName": "Windows MSVC (Release)",
+      "displayName": "Windows MSVC Release",
       "configurePreset": "windows-MSVC",
       "configuration": "Release"
     },
     {
       "name": "windows-clang-debug",
-      "displayName": "Windows clang (Debug)",
+      "displayName": "Windows clang Debug",
       "configurePreset": "windows-clang",
       "configuration": "Debug"
     },
     {
       "name": "windows-clang-release",
-      "displayName": "Windows clang (Release)",
+      "displayName": "Windows clang Release",
       "configurePreset": "windows-clang",
       "configuration": "Release"
     },
     {
       "name": "linux-clang-debug",
-      "displayName": "Linux clang (Debug)",
+      "displayName": "Linux clang Debug",
       "configurePreset": "linux-clang",
       "configuration": "Debug"
     },
     {
       "name": "linux-clang-release",
-      "displayName": "Linux clang (Release)",
+      "displayName": "Linux clang Release",
       "configurePreset": "linux-clang",
       "configuration": "Release"
     }
