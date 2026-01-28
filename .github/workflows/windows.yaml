@@ -44,6 +44,12 @@ jobs:
         version: "18.1.8"
     - name: Install Ninja
       run: choco install ninja -y
+    - name: Install glslc
+      shell: pwsh
+      run: |
+        Invoke-WebRequest https://storage.googleapis.com/shaderc/artifacts/prod/graphics_shader_compiler/shaderc/windows/latest.zip -OutFile shaderc.zip
+        Expand-Archive shaderc.zip -DestinationPath shaderc
+        echo "$PWD/shaderc/bin" >> $env:GITHUB_PATH
     - name: Bootstrap vcpkg
       run: ./vendor/vcpkg/bootstrap-vcpkg.bat
     - name: Install dependencies
@@ -55,4 +61,5 @@ jobs:
     - name: Build
       run: cmake --build --preset ${{ matrix.build_preset }}
     - name: Run tests
+      if: matrix.config == 'Debug'
       run: ./out/build/windows/${{ matrix.compiler }}/bin/Debug/tests.exe
