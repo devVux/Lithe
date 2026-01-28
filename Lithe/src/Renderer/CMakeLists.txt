@@ -3,6 +3,9 @@ add_library(Renderer STATIC)
 
 target_compile_features(Renderer PUBLIC cxx_std_23)
 
+set_target_properties(Renderer PROPERTIES
+    DEBUG_POSTFIX "D"
+)
 
 ## Variables
 set(LT_RENDERER_INCLUDE_DIR "${LITHE_INCLUDE_DIR}/Lithe/Renderer")
