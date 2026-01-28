@@ -8,11 +8,13 @@
 using namespace Lithe;
 
 int main() {
-  LT_LOG_TRACE("Hello World");
+    LT_LOG_TRACE("Hello World");
 
   EventDispatcher dispatcher;
   Window w;
-  w.init(dispatcher, 800, 600, "Window");
+  if (not w.init(dispatcher, 800, 600, "Window"))
+    LT_LOG_FATAL("Could not init window");
+
 
   using Extension = const char *;
 
@@ -22,7 +24,7 @@ int main() {
 
   std::vector<Extension> glfwExtensions(glfwExts,
                                         glfwExts + glfwExtensionCount);
-  glfwExtensions.push_back("VK_KHR_wayland_surface");
+  glfwExtensions.push_back("VK_KHR_win32_surface");
 
   bool running = true;
 
@@ -32,7 +34,8 @@ int main() {
   });
 
   RenderSystem system;
-  system.init(w, {glfwExtensions.begin(), glfwExtensions.end()});
+  if (not system.init(w, {glfwExtensions.begin(), glfwExtensions.end()}))
+	  LT_LOG_FATAL("Could not init renderer");
 
   while (running) {
     system.render();

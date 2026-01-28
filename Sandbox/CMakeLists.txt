@@ -1,42 +1,58 @@
 cmake_minimum_required(VERSION 3.21)
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-find_package(glfw3 REQUIRED)
-
-if (UNIX)
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(WAYLAND REQUIRED wayland-client)
-
-	target_compile_definitions(Sandbox
-		PRIVATE
-			GLFW_EXPOSE_NATIVE_WAYLAND
-	)
-endif()
+project(Sandbox LANGUAGES CXX)
 
 add_executable(Sandbox
-    "main.cpp"
-	"Window.cpp"
+    main.cpp
+    Window.cpp
 )
 
+target_compile_features(Sandbox PRIVATE cxx_std_23)
+
+## Dependencies
+find_package(glfw3 REQUIRED)
+find_package(spdlog REQUIRED)
 
 target_link_libraries(Sandbox
-	PRIVATE
-		Lithe
-		glfw
+    PRIVATE
+        Lithe
+        glfw
+        spdlog::spdlog
 )
 
-if (UNIX)
-target_link_libraries(Sandbox
-	PRIVATE
-		wayland-client
-)
-#endif
+option(USE_WAYLAND "Use Wayland on Linux" OFF)
 
+if(WIN32)
+    target_compile_definitions(Sandbox
+        PRIVATE 
+            GLFW_EXPOSE_NATIVE_WIN32
+    )
+elseif(UNIX AND NOT APPLE)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(WAYLAND REQUIRED wayland-client)
+
+    if (USE_WAYLAND)
+        target_compile_definitions(Sandbox
+            PRIVATE 
+                GLFW_EXPOSE_NATIVE_WAYLAND
+        )
+
+        target_link_libraries(Sandbox PRIVATE wayland-client)
+    else()
+        target_compile_definitions(Sandbox
+            PRIVATE 
+                GLFW_EXPOSE_NATIVE_X11
+        )
+
+        target_link_libraries(Sandbox)
+    endif()
+
+endif()
+
+## Installation
 install(TARGETS Sandbox
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+install(FILES $<TARGET_RUNTIME_DLLS:Sandbox> 
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
