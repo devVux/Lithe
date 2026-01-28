@@ -9,7 +9,7 @@ CONFIG = {
         "windows": {
             "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"},
             "compilers": {
-                "MSVC": {
+                "msvc": {
                     "cacheVariables": {
                         "CMAKE_C_COMPILER": "cl",
                         "CMAKE_CXX_COMPILER": "cl",
