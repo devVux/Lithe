@@ -11,17 +11,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [MSVC, clang]
+        compiler: [msvc, clang]
         config: [debug, release]
         include:
-          - compiler: MSVC
+          - compiler: msvc
             config: debug
-            configure_preset: windows-MSVC
-            build_preset: windows-MSVC-debug
-          - compiler: MSVC
+            configure_preset: windows-msvc
+            build_preset: windows-msvc-debug
+          - compiler: msvc
             config: release
-            configure_preset: windows-MSVC
-            build_preset: windows-MSVC-release
+            configure_preset: windows-msvc
+            build_preset: windows-msvc-release
           - compiler: clang
             config: debug
             configure_preset: windows-clang
@@ -47,8 +47,10 @@ jobs:
     - name: Bootstrap vcpkg
       run: ./vendor/vcpkg/bootstrap-vcpkg.bat
     - name: Install Vulkan headers
-      run: ./vendor/vcpkg/vcpkg install vulkan-headers
+      run: ./vendor/vcpkg/vcpkg install --triplet x64-windows vulkan-headers
     - name: Configure
-      run: cmake --preset ${{ matrix.configure_preset }}
+      run: cmake --preset ${{ matrix.configure_preset }} -DLITHE_BUILD_TESTS=ON
     - name: Build
       run: cmake --build --preset ${{ matrix.build_preset }}
+    - name: Run executable
+      run: ./out/build/windows/${{ matrix.compiler }}/bin/tests.exe

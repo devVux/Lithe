@@ -3,9 +3,12 @@ add_library(Core STATIC)
 
 target_compile_features(Core PUBLIC cxx_std_23)
 
+set_target_properties(Core PROPERTIES
+    DEBUG_POSTFIX "D"
+)
+
 ## Variables
 set(LT_CORE_INCLUDE_DIR "${LITHE_INCLUDE_DIR}/Lithe/Core")
-
 
 ## Dependencies
 find_package(spdlog REQUIRED)
