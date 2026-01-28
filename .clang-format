@@ -47,7 +47,6 @@ BracedInitializerIndentWidth: 4
 BreakAfterAttributes: Leave
 BreakAfterJavaFieldAnnotations: true
 BreakBeforeConceptDeclarations: Allowed
-BreakBeforeTemplateCloser: false
 BreakTemplateDeclarations: Yes
 ColumnLimit: 120
 CompactNamespaces: false
@@ -55,7 +54,6 @@ Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 EmptyLineAfterAccessModifier: Always
 EmptyLineBeforeAccessModifier: LogicalBlock
-EnumTrailingComma: Insert
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IndentCaseBlocks: false
@@ -79,7 +77,6 @@ RequiresExpressionIndentation: OuterScope
 SeparateDefinitionBlocks: Always
 SpaceAfterCStyleCast: true
 SpaceAfterLogicalNot: false
-SpaceAfterOperatorKeyword: false
 SpaceAfterTemplateKeyword: false
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeCaseColon: false
@@ -92,7 +89,6 @@ SpaceBeforeParensOptions:
   AfterFunctionDeclarationName: false
   AfterFunctionDefinitionName: false
   AfterIfMacros: true
-  AfterNot: false
   AfterOverloadedOperator: false
   AfterRequiresInExpression: false
   AfterRequiresInClause: false
