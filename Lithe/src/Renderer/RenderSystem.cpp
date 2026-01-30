@@ -339,7 +339,7 @@ namespace {
 		VkWin32SurfaceCreateInfoKHR info = {};
 		info.sType						 = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 		info.hinstance					 = GetModuleHandle(NULL);
-		info.hwnd						 = surface.handle().handle.ptr;
+		info.hwnd						 = static_cast<HWND>(surface.native().handle.ptr);
 		auto res						 = vkCreateWin32SurfaceKHR(instance, &info, nullptr, &vkSurface);
 		if (res != VK_SUCCESS)
 			return std::unexpected {Error::Unknown};

@@ -1,4 +1,4 @@
-#include "Window.hpp"
+#include "MyWindow.hpp"
 
 #include "EventDispatcher.hpp"
 #include "ISurface.hpp"
