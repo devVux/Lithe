@@ -14,6 +14,7 @@
 #include <vulkan/vulkan_core.h>
 
 #ifdef LT_WIN32
+#include <windows.h>
 #include <vulkan/vulkan_win32.h>
 #endif
 
@@ -27,8 +28,8 @@
 #endif
 
 #ifdef LT_WAYLAND
-#include <vulkan/vulkan_wayland.h>
 #include <wayland-client.h>
+#include <vulkan/vulkan_wayland.h>
 #endif
 
 struct Vertex {
@@ -337,7 +338,7 @@ namespace {
 		VkWin32SurfaceCreateInfoKHR info = {};
 		info.sType						 = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 		info.hinstance					 = GetModuleHandle(NULL);
-		info.hwnd						 = surface.handle()->handle.ptr;
+		info.hwnd						 = surface.handle()->handle;
 		auto res						 = vkCreateWin32SurfaceKHR(instance, &info, nullptr, &vkSurface);
 		if (res != VK_SUCCESS)
 			return std::unexpected {Error::Unknown};
