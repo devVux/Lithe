@@ -48,7 +48,7 @@ jobs:
       run: ./vendor/vcpkg/bootstrap-vcpkg.bat
     - name: Install dependencies
       run: |
-        set VCPKG_ROOT=
+        $env:VCPKG_ROOT = ""
         ./vendor/vcpkg/vcpkg install --triplet x64-windows
     - name: Configure
       run: cmake --preset ${{ matrix.configure_preset }} -DLITHE_BUILD_TESTS=ON
