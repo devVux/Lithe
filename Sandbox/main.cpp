@@ -16,16 +16,15 @@ int main() {
   if (not w.init(dispatcher, 800, 600, "Window"))
     LT_LOG_FATAL("Could not init window");
 
+	using Extension = const char*;
 
-  using Extension = const char *;
+	uint32_t	 glfwExtensionCount = 0;
+	const char** glfwExts			= glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-  uint32_t glfwExtensionCount = 0;
-  const char **glfwExts =
-      glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-  std::vector<Extension> glfwExtensions(glfwExts,
-                                        glfwExts + glfwExtensionCount);
-  glfwExtensions.push_back("VK_KHR_win32_surface");
+	std::vector<Extension> glfwExtensions(glfwExts, glfwExts + glfwExtensionCount);
+#if defined(GLFW_EXPOSE_NATIVE_X11) || defined(GLFW_EXPOSE_NATIVE_WAYLAND)
+	glfwExtensions.push_back("VK_KHR_xlib_surface");
+#endif
 
   bool running = true;
 
