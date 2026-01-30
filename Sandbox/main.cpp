@@ -9,12 +9,14 @@
 using namespace Lithe;
 
 int main() {
-    LT_LOG_TRACE("Hello World");
+	LT_LOG_TRACE("Hello World");
 
-  EventDispatcher dispatcher;
+	EventDispatcher dispatcher;
 	MyWindow		w;
-  if (not w.init(dispatcher, 800, 600, "Window"))
-    LT_LOG_FATAL("Could not init window");
+	if (not w.init(dispatcher, 800, 600, "Window")) {
+		LT_LOG_CRITICAL("Could not init window");
+		return 1;
+	}
 
 	using Extension = const char*;
 
@@ -26,21 +28,23 @@ int main() {
 	glfwExtensions.push_back("VK_KHR_xlib_surface");
 #endif
 
-  bool running = true;
+	bool running = true;
 
-  dispatcher.on<WindowEvents::WindowClosedEvent>([&running](auto &&e) {
-    running = false;
-    return true;
-  });
+  	dispatcher.on<WindowEvents::WindowClosedEvent>([&running](auto &&e) {
+		running = false;
+		return true;
+	});
 
-  RenderSystem system;
-  if (not system.init(w, {glfwExtensions.begin(), glfwExtensions.end()}))
-	  LT_LOG_FATAL("Could not init renderer");
+	RenderSystem system;
+	if (not system.init(w, {glfwExtensions.begin(), glfwExtensions.end()})) {
+		LT_LOG_CRITICAL("Could not init renderer");
+		return 1;
+	}
 
-  while (running) {
-    system.render();
-    w.update(dispatcher);
-  }
+	while (running) {
+		system.render();
+		w.update(dispatcher);
+	}
 
-  LT_LOG_TRACE("Bye world");
+	LT_LOG_TRACE("Bye world");
 }
