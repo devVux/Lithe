@@ -1,8 +1,9 @@
 #include "EventDispatcher.hpp"
 #include "Events/WindowEvents.hpp"
+#include "MyWindow.hpp"
 #include "RenderSystem.hpp"
-#include "Window.hpp"
 
+#include <GLFW/glfw3.h>
 #include <Log.hpp>
 
 using namespace Lithe;
@@ -11,7 +12,7 @@ int main() {
     LT_LOG_TRACE("Hello World");
 
   EventDispatcher dispatcher;
-  Window w;
+	MyWindow		w;
   if (not w.init(dispatcher, 800, 600, "Window"))
     LT_LOG_FATAL("Could not init window");
 

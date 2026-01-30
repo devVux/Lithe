@@ -4,7 +4,7 @@ project(Sandbox LANGUAGES CXX)
 
 add_executable(Sandbox
     main.cpp
-    Window.cpp
+    MyWindow.cpp
 )
 
 target_compile_features(Sandbox PRIVATE cxx_std_23)
@@ -24,27 +24,30 @@ option(USE_WAYLAND "Use Wayland on Linux" OFF)
 
 if(WIN32)
     target_compile_definitions(Sandbox
-        PRIVATE 
+        PRIVATE
             GLFW_EXPOSE_NATIVE_WIN32
     )
 elseif(UNIX AND NOT APPLE)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(WAYLAND REQUIRED wayland-client)
-
     if (USE_WAYLAND)
+		find_package(PkgConfig REQUIRED)
+		pkg_check_modules(WAYLAND REQUIRED wayland-client)
+
         target_compile_definitions(Sandbox
             PRIVATE 
                 GLFW_EXPOSE_NATIVE_WAYLAND
         )
 
         target_link_libraries(Sandbox PRIVATE wayland-client)
+
     else()
+		find_package(X11 REQUIRED)
+
         target_compile_definitions(Sandbox
             PRIVATE 
                 GLFW_EXPOSE_NATIVE_X11
         )
 
-        target_link_libraries(Sandbox)
+        target_link_libraries(Sandbox PRIVATE X11)
     endif()
 
 endif()
