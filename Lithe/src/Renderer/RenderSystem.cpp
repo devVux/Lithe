@@ -3,20 +3,17 @@
 #include "ForwardDecls.hpp"
 #include "Log.hpp"
 
+#include <algorithm>
+#include <cassert>
 #include <expected>
 #include <fstream>
 #include <optional>
 #include <set>
 #include <vector>
-#include <algorithm>
-#include <cassert>
-
-
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
 #ifdef LT_WIN32
-#include <windows.h>
 #include <vulkan/vulkan_win32.h>
 #endif
 
@@ -30,8 +27,8 @@
 #endif
 
 #ifdef LT_WAYLAND
-#include <vulkan/vulkan_wayland.h>
 #include <wayland-client.h>
+#include <vulkan/vulkan_wayland.h>
 #endif
 
 
@@ -341,30 +338,23 @@ namespace {
 		VkWin32SurfaceCreateInfoKHR info = {};
 		info.sType						 = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 		info.hinstance					 = GetModuleHandle(NULL);
-		info.hwnd						 = static_cast<HWND>(surface.handle());
-		auto res = vkCreateWin32SurfaceKHR(instance, &info, nullptr, &vkSurface);
-		if (res != VK_SUCCESS)
-			return std::unexpected {Error::Unknown};
-#elif defined(LT_COCOA)
-		VkMetalSurfaceCreateInfoEXT info = {};
-		info.sType						 = VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT;
-		info.pLayer						 = static_cast<void*>(surface.handle();
-		auto res = vkCreateMetalSurfaceEXT(instance, &info, nullptr, vkSurface);
+		info.hwnd						 = surface.handle()->handle;
+		auto res						 = vkCreateWin32SurfaceKHR(instance, &info, nullptr, &vkSurface);
 		if (res != VK_SUCCESS)
 			return std::unexpected {Error::Unknown};
 #elif defined(LT_X11)
 		VkXlibSurfaceCreateInfoKHR info = {};
 		info.sType						= VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
-		info.dpy						= static_cast<Display*>(surface.display());
-		info.window						= static_cast<Window>(surface.handle());
-		auto res = vkCreateXlibSurfaceKHR(instance, &info, nullptr, &vkSurface);
+		info.dpy						= static_cast<Display*>(surface.native().display);
+		info.window						= surface.native().handle.id;
+		auto res						= vkCreateXlibSurfaceKHR(instance, &info, nullptr, &vkSurface);
 		if (res != VK_SUCCESS)
 			return std::unexpected {Error::Unknown};
 #elif defined(LT_WAYLAND)
 		VkWaylandSurfaceCreateInfoKHR info {
-			.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR, 
-			.display = static_cast<wl_display*>(surface.display()), 
-			.surface = static_cast<wl_surface*>(surface.handle()), 
+			.sType	 = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR,
+			.display = static_cast<wl_display*>(surface.native().display),
+			.surface = static_cast<wl_surface*>(surface.native().handle.ptr),
 		};
 
 		auto res = vkCreateWaylandSurfaceKHR(instance, &info, nullptr, &vkSurface);
@@ -378,6 +368,7 @@ namespace {
 } // namespace
 
 namespace {
+	static VkSurfaceFormatKHR surfaceFormat;
 
 	struct SwapChainSupportDetails {
 		VkSurfaceCapabilitiesKHR		capabilities;
@@ -447,9 +438,9 @@ namespace {
 	) {
 		SwapChainSupportDetails swapChainSupport = querySwapchainSupport(physicalDevice, surface);
 
-		VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
-		VkPresentModeKHR   presentMode	 = chooseSwapPresentMode(swapChainSupport.presentModes);
-		VkExtent2D		   extent		 = chooseSwapExtent(swapChainSupport.capabilities, size);
+		surfaceFormat				 = chooseSwapSurfaceFormat(swapChainSupport.formats);
+		VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
+		VkExtent2D		 extent		 = chooseSwapExtent(swapChainSupport.capabilities, size);
 
 		uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
 		if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
@@ -529,11 +520,10 @@ namespace {
 		colorBlending.attachmentCount					  = 1;
 		colorBlending.pAttachments						  = &colorBlendAttachment;
 
-		VkFormat					  colorFormat			= VK_FORMAT_R8G8B8A8_SRGB;
 		VkPipelineRenderingCreateInfo pipelineRenderingInfo = {};
 		pipelineRenderingInfo.sType							= VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
 		pipelineRenderingInfo.colorAttachmentCount			= 1;
-		pipelineRenderingInfo.pColorAttachmentFormats		= &colorFormat;
+		pipelineRenderingInfo.pColorAttachmentFormats		= &surfaceFormat.format;
 		pipelineRenderingInfo.depthAttachmentFormat			= VK_FORMAT_UNDEFINED; // or VK_FORMAT_UNDEFINED if no depth
 
 		auto vertShaderModule = createShaderModule(device, SHADERS_DIR "/vertex.spv");
@@ -795,8 +785,7 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 	mImages.resize(imageCount);
 	vkGetSwapchainImagesKHR(mDevice, mSwapchain, &imageCount, mImages.data());
 
-	auto			   support		 = querySwapchainSupport(selectedBundle.physicalDevice, mSurface);
-	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(support.formats);
+	auto support = querySwapchainSupport(selectedBundle.physicalDevice, mSurface);
 
 	mImageViews.resize(imageCount);
 
