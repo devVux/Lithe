@@ -4,7 +4,14 @@
 
 namespace Lithe {
 
-using NativeHandle = void*;
+struct NativeHandle {
+	union {
+		void*		  ptr; // For Win32 HWND, Wayland surfaces
+		unsigned long id;  // For X11 Window (XID)
+	} handle {};
+
+	void* display {nullptr}; // For X11 Display*, Wayland display
+};
 
 class ISurface {
 
@@ -18,14 +25,11 @@ public:
 	virtual ~ISurface() noexcept		 = default;
 
 	// Support for native windows (e.g. Win32, Cocoa, X11, ecc...) via injected
-	// `EventDispatcher` If you have a reactive windowing system, just subclass
-	// and pass the dispatcher to an init function or constructor
+	// `EventDispatcher`. If you have a reactive windowing system, just subclass
+	// and pass the dispatcher to an init function or constructor.
 	virtual void update(EventDispatcher&) const noexcept = 0;
 
-	[[nodiscard]] virtual NativeHandle handle() const noexcept = 0;
-
-	// For linux only
-	[[nodiscard]] virtual NativeHandle display() const noexcept { return nullptr; }
+	[[nodiscard]] virtual NativeHandle native() const noexcept = 0;
 };
 
 } // namespace Lithe
