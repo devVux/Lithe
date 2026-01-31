@@ -39,6 +39,8 @@ target_include_directories(Renderer
 target_sources(Renderer
     PRIVATE
         RenderSystem.cpp
+        Inits.cpp
+
     PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${LT_RENDERER_INCLUDE_DIR}
