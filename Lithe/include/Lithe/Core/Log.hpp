@@ -32,10 +32,5 @@ class Logger {
 #define LT_LOG_WARN(...) Logger::coreLogger()->warn(__VA_ARGS__)
 #define LT_LOG_ERROR(...) Logger::coreLogger()->error(__VA_ARGS__)
 #define LT_LOG_CRITICAL(...) Lithe::Logger::coreLogger()->critical(__VA_ARGS__)
-#define LT_LOG_FATAL(...)                                   \
-	{                                                       \
-		Lithe::Logger::coreLogger()->critical(__VA_ARGS__); \
-		return false;                                           \
-	}
 
 } // namespace Lithe
