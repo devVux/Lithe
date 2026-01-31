@@ -3,7 +3,6 @@
 #include <functional>
 #include <utility>
 
-namespace {
 
 #ifndef LT_USE_64_BIT_PTR_DEFINES
 #if defined(__LP64__) || defined(_WIN64) || (defined(__x86_64__) && !defined(__ILP32__)) || defined(_M_X64) || \
@@ -76,4 +75,3 @@ struct RAIIed {
 	operator const T&() const noexcept { return t; }
 };
 
-} // namespace Lithe
