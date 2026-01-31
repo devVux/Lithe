@@ -30,6 +30,8 @@ public:
 	virtual void update(EventDispatcher&) const noexcept = 0;
 
 	[[nodiscard]] virtual NativeHandle native() const noexcept = 0;
+
+	[[nodiscard]] virtual Size size() const noexcept = 0;
 };
 
 } // namespace Lithe

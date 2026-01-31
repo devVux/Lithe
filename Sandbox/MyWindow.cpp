@@ -124,3 +124,12 @@ void MyWindow::update(EventDispatcher&) const noexcept {
 	if (!glfwWindowShouldClose(pWindow))
 		glfwPollEvents();
 }
+
+Lithe::Size MyWindow::size() const noexcept {
+	int width = 0;
+	int height = 0;
+
+	glfwGetWindowSize(pWindow, &width, &height);
+
+	return {.width = static_cast<uint32_t>(width), .height = static_cast<uint32_t>(height)};
+}

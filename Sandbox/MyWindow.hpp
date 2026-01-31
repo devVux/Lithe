@@ -23,6 +23,7 @@ public:
 	void update(Lithe::EventDispatcher&) const noexcept override;
 
 	[[nodiscard]] Lithe::NativeHandle native() const noexcept override;
+	[[nodiscard]] Lithe::Size size() const noexcept override;
 
 private:
 
