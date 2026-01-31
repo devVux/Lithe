@@ -13,26 +13,6 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
-#ifdef LT_WIN32
-#include <windows.h>
-#include <vulkan/vulkan_win32.h>
-#include <windows.h>
-#endif
-
-#ifdef LT_COCOA
-#include <QuartzCore/CAMetalLayer.h>
-#endif
-
-#ifdef LT_X11
-#include <X11/Xlib.h>
-#include <vulkan/vulkan_xlib.h>
-#endif
-
-#ifdef LT_WAYLAND
-#include <wayland-client.h>
-#include <vulkan/vulkan_wayland.h>
-#endif
-
 struct Vertex {
 	float pos[3];
 	float color[4];
@@ -327,43 +307,6 @@ namespace {
 			return std::unexpected {Error::Unknown};
 
 		return device;
-	}
-
-} // namespace
-
-namespace {
-
-	std::expected<VkSurfaceKHR, Error> createSurface(VkInstance instance, ISurface& surface) {
-		VkSurfaceKHR vkSurface;
-#ifdef LT_WIN32
-		VkWin32SurfaceCreateInfoKHR info = {};
-		info.sType						 = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		info.hinstance					 = GetModuleHandle(NULL);
-		info.hwnd						 = static_cast<HWND>(surface.native().handle.ptr);
-		auto res						 = vkCreateWin32SurfaceKHR(instance, &info, nullptr, &vkSurface);
-		if (res != VK_SUCCESS)
-			return std::unexpected {Error::Unknown};
-#elif defined(LT_X11)
-		VkXlibSurfaceCreateInfoKHR info = {};
-		info.sType						= VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
-		info.dpy						= static_cast<Display*>(surface.native().display);
-		info.window						= surface.native().handle.id;
-		auto res						= vkCreateXlibSurfaceKHR(instance, &info, nullptr, &vkSurface);
-		if (res != VK_SUCCESS)
-			return std::unexpected {Error::Unknown};
-#elif defined(LT_WAYLAND)
-		VkWaylandSurfaceCreateInfoKHR info {
-			.sType	 = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR,
-			.display = static_cast<wl_display*>(surface.native().display),
-			.surface = static_cast<wl_surface*>(surface.native().handle.ptr),
-		};
-
-		auto res = vkCreateWaylandSurfaceKHR(instance, &info, nullptr, &vkSurface);
-		if (res != VK_SUCCESS)
-			return std::unexpected {Error::Unknown};
-#endif
-
-		return {vkSurface};
 	}
 
 } // namespace
@@ -739,7 +682,7 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 	else
 		LT_LOG_FATAL("Could not create Vulkan instance");
 
-	auto surface2 = createSurface(mInstance, surface);
+	auto surface2 = SurfaceFactory::createSurface(mInstance, surface);
 
 	if (surface2)
 		mSurface =

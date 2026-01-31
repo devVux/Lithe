@@ -45,8 +45,15 @@ target_sources(Renderer
         FILES
             ${LT_RENDERER_INCLUDE_DIR}/ForwardDecls.hpp
             ${LT_RENDERER_INCLUDE_DIR}/RenderSystem.hpp
+            ${LT_RENDERER_INCLUDE_DIR}/SurfaceFactory.hpp
 )
 
+if(WIN32)
+    target_sources(Renderer
+        PRIVATE
+           Platform/Windows/Win32Surface.cpp
+    )
+endif()
 
 ## Shader Compilation
 file(GLOB_RECURSE SHADER_SOURCES CONFIGURE_DEPENDS
