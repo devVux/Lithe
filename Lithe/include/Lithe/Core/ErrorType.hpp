@@ -2,7 +2,7 @@
 
 namespace Lithe {
 
-	enum class DefaultError {
+	enum class E {
 		Unknown
 	};
 
