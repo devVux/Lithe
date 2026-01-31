@@ -2,8 +2,10 @@
 
 namespace Lithe {
 
-	enum class E {
+	enum class DefaultError {
 		Unknown
 	};
+
+	using E = DefaultError;
 
 }
