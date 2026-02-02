@@ -10,7 +10,7 @@ class IResourceCache {
 		
 		virtual ~IResourceCache() = default;
 
-		virtual MeshData getMesh(MeshID) = 0;
+		[[nodiscard]] virtual MeshData getMesh(MeshID) const noexcept = 0;
 
 };
 
