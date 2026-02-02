@@ -25,6 +25,7 @@ add_library(Lithe INTERFACE)
 
 add_subdirectory(src/Core)
 add_subdirectory(src/Renderer)
+add_subdirectory(src/Scene)
 
 if(LITHE_BUILD_TESTS)
     message(STATUS "Testing enabled")
@@ -35,6 +36,7 @@ target_link_libraries(Lithe
     INTERFACE
         Core
         Renderer
+		Scene
 )
 
 
@@ -82,7 +84,12 @@ target_compile_definitions(Renderer
 include(GNUInstallDirs)
 
 install(
-    TARGETS Lithe Core Renderer
+    TARGETS 
+		Lithe
+		Core
+		Renderer
+		Scene
+
     EXPORT LitheTargets
     FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
