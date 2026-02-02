@@ -2,6 +2,9 @@
 
 #include "ForwardDecls.hpp"
 #include "ISurface.hpp"
+#include "RenderPacket.hpp"
+#include "IResourceCache.hpp"
+#include "Allocator.hpp"
 
 #include <optional>
 #include <set>
@@ -29,7 +32,8 @@ public:
 	~RenderSystem() noexcept;
 	bool init(ISurface&, std::set<Extension> = {});
 
-	void render();
+	bool uploadStaticData(StaticRenderPacket&, IResourceCache&) noexcept;
+	void render(DynamicRenderPacket&, IResourceCache&);
 
 private:
 
@@ -44,6 +48,7 @@ private:
 
 	RAIIed<VkPipeline>		 mPipeline;
 	RAIIed<VkPipelineLayout> mPipelineLayout;
+	RAIIed<VkDescriptorSetLayout> mDescriptorSetLayout;
 
 	RAIIed<VkCommandPool>		 mCommandPool;
 	std::vector<VkCommandBuffer> mCommandBuffers;
@@ -51,9 +56,9 @@ private:
 	std::vector<VkImage>			 mImages;
 	std::vector<RAIIed<VkImageView>> mImageViews;
 
-	RAIIed<VkDeviceMemory> mMemory;
-	RAIIed<VkBuffer>	   mVertexBuffer;
-	RAIIed<VkBuffer>	   mIndexBuffer;
+	Buffer mVertexBuffer;
+	Buffer mIndexBuffer;
+	std::vector<Buffer> mUniformBuffers;
 
 	VkQueue mGraphicsQueue;
 	VkQueue mPresentQueue;
@@ -61,6 +66,12 @@ private:
 	std::vector<RAIIed<VkSemaphore>> mImageAvailableSemaphore;
 	std::vector<RAIIed<VkSemaphore>> mRenderFinishedSemaphore;
 	std::vector<RAIIed<VkFence>>	 mInFlightFence;
+
+	RAIIed<VkDescriptorPool> mDescriptorPool;
+	std::vector<VkDescriptorSet> mDescriptorSets;
+
+	Allocator mAllocator;
+
 };
 
 } // namespace Lithe

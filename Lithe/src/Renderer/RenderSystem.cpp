@@ -19,7 +19,6 @@
 #include <vma/vk_mem_alloc.h>
 
 
-
 constexpr size_t operator""_KB(unsigned long long v) {
 	return v * 1'024;
 }
@@ -41,89 +40,8 @@ namespace Lithe {
 RenderSystem::~RenderSystem() noexcept {
 	vkDeviceWaitIdle(mDevice);
 
-	for (auto layout : mDescriptorLayouts)
-		vkDestroyDescriptorSetLayout(mDevice, layout, nullptr);
+
 }
-
-
-
-
-Allocator::Allocator(VkPhysicalDevice physicalDevice, VkDevice device, VkInstance instance) {
-	VmaVulkanFunctions funcs {};
-	funcs.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
-	funcs.vkGetDeviceProcAddr	= vkGetDeviceProcAddr;
-
-	VmaAllocatorCreateInfo info {};
-	info.physicalDevice	  = physicalDevice;
-	info.device			  = device;
-	info.instance		  = instance;
-	info.pVulkanFunctions = &funcs;
-	info.vulkanApiVersion = VK_API_VERSION_1_3;
-
-	vmaCreateAllocator(&info, &allocator);
-}
-
-Allocator::Allocator(Allocator&& other) noexcept: 
-	allocator(other.allocator), buffers(std::move(other.buffers)), allocations(std::move(other.allocations)) {
-	other.allocator = VK_NULL_HANDLE;
-}
-
-Allocator& Allocator::operator = (Allocator && other) noexcept {
-	if (this != &other) {
-		
-		// cleanup
-		if (allocator) {
-			for (auto [buffer, allocation] : std::views::zip(buffers, allocations))
-				vmaDestroyBuffer(allocator, buffer.handle, allocation);
-			vmaDestroyAllocator(allocator);
-		}
-
-
-
-
-		allocator		= other.allocator;
-		buffers			= std::move(other.buffers);
-		allocations		= std::move(other.allocations);
-		other.allocator = VK_NULL_HANDLE;
-	}
-
-	return *this;
-}
-
-Allocator::~Allocator() noexcept {
-	if (!allocator)
-		return;
-
-	for (auto [buffer, allocation] : std::views::zip(buffers, allocations))
-		vmaDestroyBuffer(allocator, buffer.handle, allocation);
-	vmaDestroyAllocator(allocator);
-}
-
-Buffer Allocator::createBuffer(
-	VkDeviceSize size, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage, VmaAllocationCreateFlags flags
-) {
-	VkBufferCreateInfo bufferInfo {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
-	bufferInfo.size	 = size;
-	bufferInfo.usage = usage;
-
-	VmaAllocationCreateInfo allocInfo {};
-	allocInfo.usage = memoryUsage;
-	allocInfo.flags = flags;
-
-	Buffer			  buf {};
-	VmaAllocation	  allocation;
-	VmaAllocationInfo allocDetails;
-
-	vmaCreateBuffer(allocator, &bufferInfo, &allocInfo, &buf.handle, &allocation, &allocDetails);
-	buf.mapped = allocDetails.pMappedData;
-
-	buffers.push_back(buf);
-	allocations.push_back(allocation);
-	return buf;
-}
-
-
-
 
 bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 
@@ -279,7 +197,7 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 				if (!descriptor || !layout || !pipe)
 					return std::unexpected(E::Unknown);
 
-				mDescriptor = RAIIed<VkDescriptorSetLayout>(
+				mDescriptorSetLayout = RAIIed<VkDescriptorSetLayout>(
 					*descriptor, [device = static_cast<VkDevice>(mDevice)](VkDescriptorSetLayout layout) noexcept {
 						if (layout)
 							vkDestroyDescriptorSetLayout(device, layout, nullptr);
@@ -355,16 +273,14 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 	mAllocator = Allocator(mPhysicalDevice, mDevice, mInstance);
 
 	mVertexBuffer =
-		mAllocator.createBuffer(1_MB, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+		mAllocator.createBuffer(1_MB, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, Mapped::Yes);
 
 	mIndexBuffer =
-		mAllocator.createBuffer(1_MB, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+		mAllocator.createBuffer(1_MB, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, Mapped::Yes);
 
-
+	mUniformBuffers.resize(nFramesInFlight);
 	for (size_t i = 0; i < nFramesInFlight; i++)
-		mUniformBuffers.emplace_back(
-			mAllocator.createBuffer(1_MB, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT)
-		);
+		mUniformBuffers[i] = mAllocator.createBuffer(1_MB, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, Mapped::Yes);
 
 
 
@@ -430,13 +346,13 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 	assert(vkCreateDescriptorPool(mDevice, &poolInfo, nullptr, &descriptorPool) == VK_SUCCESS);
 
 
-	std::vector<VkDescriptorSetLayout> layouts(nFramesInFlight, mDescriptor);
-	VkDescriptorSetAllocateInfo		   allocInfo {};
+	std::vector<VkDescriptorSetLayout> duplicateSetLayouts(nFramesInFlight, mDescriptorSetLayout);
+
+	VkDescriptorSetAllocateInfo allocInfo {};
 	allocInfo.sType				 = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool	 = descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(nFramesInFlight);
-	allocInfo.pSetLayouts		 = layouts.data();
-
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(duplicateSetLayouts.size());
+	allocInfo.pSetLayouts		 = duplicateSetLayouts.data();
 
 
 	mDescriptorSets.resize(nFramesInFlight);
@@ -464,14 +380,10 @@ struct Vertex {
 	glm::vec2 uv;
 };
 
-
-static uint32_t totalIndices;
-
-
 bool RenderSystem::uploadStaticData(StaticRenderPacket& statics, IResourceCache& cache) noexcept {
 	
-	std::vector<Vertex> vertices(statics.totalVertexCount);
-	std::vector<uint32_t> indices(statics.totalIndexCount);
+	std::vector<Vertex> vertices(cache.countVertices());
+	std::vector<uint32_t> indices(cache.countIndices());
 
 	std::size_t vertexOffset = 0;
 	std::size_t indexOffset = 0;
@@ -498,8 +410,6 @@ bool RenderSystem::uploadStaticData(StaticRenderPacket& statics, IResourceCache&
 
 	std::memcpy(mVertexBuffer.mapped, vertices.data(), vertices.size() * sizeof(Vertex));
 	std::memcpy(mIndexBuffer.mapped, indices.data(), indices.size() * sizeof(uint32_t));
-
-	totalIndices = indices.size();
 
 	return true;
 }
@@ -589,7 +499,6 @@ void RenderSystem::render(DynamicRenderPacket& dynamics, IResourceCache& cache) 
 
 	std::memcpy(mUniformBuffers[currentFrame].mapped, &dynamics.camera, sizeof(glm::mat4));
 
-
 	VkDescriptorBufferInfo bufferInfo{};
 	bufferInfo.buffer = mUniformBuffers[currentFrame].handle;
 	bufferInfo.offset = 0;
@@ -614,7 +523,8 @@ void RenderSystem::render(DynamicRenderPacket& dynamics, IResourceCache& cache) 
 	VkDeviceSize offsets[] = {0};
 	vkCmdBindVertexBuffers(cmd, 0, 1, &mVertexBuffer.handle, offsets);
 	vkCmdBindIndexBuffer(cmd, mIndexBuffer.handle, 0, VK_INDEX_TYPE_UINT32);
-	vkCmdDrawIndexed(cmd, totalIndices, 1, 0, 0, 0);
+
+	vkCmdDrawIndexed(cmd, cache.countIndices(), 1, 0, 0, 0);
 
 
 

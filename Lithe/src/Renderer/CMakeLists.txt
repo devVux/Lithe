@@ -35,31 +35,28 @@ target_include_directories(Renderer
         $<INSTALL_INTERFACE:include>
 )
 
-## Definitions
-target_compile_definitions(Renderer
-    PRIVATE
-        VMA_IMPLEMENTATION
-)
 
 ## Sources
 target_sources(Renderer
     PRIVATE
-        RenderSystem.cpp
-        Inits.cpp
+        "RenderSystem.cpp"
+        "Inits.cpp"
+        "Allocator.cpp"
 
     PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${LT_RENDERER_INCLUDE_DIR}
         FILES
-            ${LT_RENDERER_INCLUDE_DIR}/ForwardDecls.hpp
-            ${LT_RENDERER_INCLUDE_DIR}/RenderSystem.hpp
-            ${LT_RENDERER_INCLUDE_DIR}/SurfaceFactory.hpp
+            "${LT_RENDERER_INCLUDE_DIR}/ForwardDecls.hpp"
+            "${LT_RENDERER_INCLUDE_DIR}/RenderSystem.hpp"
+            "${LT_RENDERER_INCLUDE_DIR}/SurfaceFactory.hpp"
+            "${LT_RENDERER_INCLUDE_DIR}/Allocator.hpp"
 )
 
 if(WIN32)
     target_sources(Renderer
         PRIVATE
-           Platform/Windows/Win32Surface.cpp
+           "Platform/Windows/Win32Surface.cpp"
     )
 endif()
 
