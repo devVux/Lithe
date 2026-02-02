@@ -23,7 +23,6 @@
 #define LT_DEFINE_NON_DISPATCHABLE_HANDLE(object) typedef uint64_t object;
 #endif
 #endif
-
 LT_DEFINE_HANDLE(VkInstance)
 LT_DEFINE_HANDLE(VkPhysicalDevice)
 LT_DEFINE_HANDLE(VkDevice)
@@ -51,6 +50,9 @@ LT_DEFINE_NON_DISPATCHABLE_HANDLE(VkDescriptorSetLayout)
 LT_DEFINE_NON_DISPATCHABLE_HANDLE(VkSampler)
 LT_DEFINE_NON_DISPATCHABLE_HANDLE(VkDescriptorSet)
 LT_DEFINE_NON_DISPATCHABLE_HANDLE(VkDescriptorPool)
+
+LT_DEFINE_HANDLE(VmaAllocator)
+LT_DEFINE_HANDLE(VmaAllocation)
 
 template<typename T, typename Deleter = std::function<void(T)>>
 struct RAIIed {

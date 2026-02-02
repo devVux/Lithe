@@ -16,11 +16,14 @@ message(STATUS "Compiling shaders to ${SHADER_OUTPUT_DIR}")
 
 ## Dependencies
 find_package(Vulkan REQUIRED)
+find_package(VulkanMemoryAllocator REQUIRED)
 find_program(GLSLC glslc REQUIRED)
 
 target_link_libraries(Renderer
     PRIVATE
         Vulkan::Vulkan
+        Vulkan::Headers
+        GPUOpen::VulkanMemoryAllocator
         Core
 )
 
@@ -33,7 +36,10 @@ target_include_directories(Renderer
 )
 
 ## Definitions
-
+target_compile_definitions(Renderer
+    PRIVATE
+        VMA_IMPLEMENTATION
+)
 
 ## Sources
 target_sources(Renderer

@@ -12,13 +12,26 @@
 #include <optional>
 #include <set>
 #include <vector>
+#include <ranges>
+
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
+#include <vma/vk_mem_alloc.h>
 
-struct Vertex {
-	float pos[3];
-	float color[4];
-};
+
+
+constexpr size_t operator""_KB(unsigned long long v) {
+	return v * 1'024;
+}
+
+constexpr size_t operator""_MB(unsigned long long v) {
+	return v * 1'024 * 1'024;
+}
+
+constexpr size_t operator""_GB(unsigned long long v) {
+	return v * 1'024 * 1'024 * 1'024;
+}
+
 
 static int currentFrame	   = 0;
 static int nFramesInFlight = 2;
@@ -27,19 +40,90 @@ namespace Lithe {
 
 RenderSystem::~RenderSystem() noexcept {
 	vkDeviceWaitIdle(mDevice);
+
+	for (auto layout : mDescriptorLayouts)
+		vkDestroyDescriptorSetLayout(mDevice, layout, nullptr);
 }
 
 
-uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeBits, VkMemoryPropertyFlags properties) {
-	VkPhysicalDeviceMemoryProperties memProps;
-	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProps);
 
-	for (uint32_t i = 0; i < memProps.memoryTypeCount; i++)
-		if ((typeBits & (1u << i)) && (memProps.memoryTypes[i].propertyFlags & properties) == properties)
-			return i;
 
-	return UINT32_MAX;
+Allocator::Allocator(VkPhysicalDevice physicalDevice, VkDevice device, VkInstance instance) {
+	VmaVulkanFunctions funcs {};
+	funcs.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+	funcs.vkGetDeviceProcAddr	= vkGetDeviceProcAddr;
+
+	VmaAllocatorCreateInfo info {};
+	info.physicalDevice	  = physicalDevice;
+	info.device			  = device;
+	info.instance		  = instance;
+	info.pVulkanFunctions = &funcs;
+	info.vulkanApiVersion = VK_API_VERSION_1_3;
+
+	vmaCreateAllocator(&info, &allocator);
 }
+
+Allocator::Allocator(Allocator&& other) noexcept: 
+	allocator(other.allocator), buffers(std::move(other.buffers)), allocations(std::move(other.allocations)) {
+	other.allocator = VK_NULL_HANDLE;
+}
+
+Allocator& Allocator::operator = (Allocator && other) noexcept {
+	if (this != &other) {
+		
+		// cleanup
+		if (allocator) {
+			for (auto [buffer, allocation] : std::views::zip(buffers, allocations))
+				vmaDestroyBuffer(allocator, buffer.handle, allocation);
+			vmaDestroyAllocator(allocator);
+		}
+
+
+
+
+		allocator		= other.allocator;
+		buffers			= std::move(other.buffers);
+		allocations		= std::move(other.allocations);
+		other.allocator = VK_NULL_HANDLE;
+	}
+
+	return *this;
+}
+
+Allocator::~Allocator() noexcept {
+	if (!allocator)
+		return;
+
+	for (auto [buffer, allocation] : std::views::zip(buffers, allocations))
+		vmaDestroyBuffer(allocator, buffer.handle, allocation);
+	vmaDestroyAllocator(allocator);
+}
+
+Buffer Allocator::createBuffer(
+	VkDeviceSize size, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage, VmaAllocationCreateFlags flags
+) {
+	VkBufferCreateInfo bufferInfo {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
+	bufferInfo.size	 = size;
+	bufferInfo.usage = usage;
+
+	VmaAllocationCreateInfo allocInfo {};
+	allocInfo.usage = memoryUsage;
+	allocInfo.flags = flags;
+
+	Buffer			  buf {};
+	VmaAllocation	  allocation;
+	VmaAllocationInfo allocDetails;
+
+	vmaCreateBuffer(allocator, &bufferInfo, &allocInfo, &buf.handle, &allocation, &allocDetails);
+	buf.mapped = allocDetails.pMappedData;
+
+	buffers.push_back(buf);
+	allocations.push_back(allocation);
+	return buf;
+}
+
+
+
 
 bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 
@@ -190,10 +274,17 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 			})
 			.and_then([&](InitContext ctx) -> std::expected<InitContext, E> {
 				LT_LOG_TRACE("Creating pipeline");
-				auto [layout, pipe] = Pipeline::createPipeline(mDevice, {800, 600}, ctx.surfaceFormat.format);
+				auto [descriptor, layout, pipe] = Pipeline::createPipeline(mDevice, ctx.extent, ctx.surfaceFormat.format);
 
-				if (!layout || !pipe)
+				if (!descriptor || !layout || !pipe)
 					return std::unexpected(E::Unknown);
+
+				mDescriptor = RAIIed<VkDescriptorSetLayout>(
+					*descriptor, [device = static_cast<VkDevice>(mDevice)](VkDescriptorSetLayout layout) noexcept {
+						if (layout)
+							vkDestroyDescriptorSetLayout(device, layout, nullptr);
+					}
+				);
 
 				mPipelineLayout = RAIIed<VkPipelineLayout>(
 					*layout, [device = static_cast<VkDevice>(mDevice)](VkPipelineLayout layout) noexcept {
@@ -258,52 +349,24 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 	if (!result)
 		return false;
 
-	Vertex vertices[3] = {
-		{{0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-		{ {0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-		{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f, 1.0f}}
-	};
 
-	VkDeviceSize bufferSize = sizeof(vertices);
 
-	VkBufferCreateInfo bufferInfo = {
-		.sType		 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-		.size		 = bufferSize,
-		.usage		 = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-		.sharingMode = VK_SHARING_MODE_EXCLUSIVE
-	};
-	VkBuffer vertexBuffer;
-	vkCreateBuffer(mDevice, &bufferInfo, NULL, &vertexBuffer);
-	mVertexBuffer = RAIIed<VkBuffer>(vertexBuffer, [device = static_cast<VkDevice>(mDevice)](auto buffer) noexcept {
-		if (buffer)
-			vkDestroyBuffer(device, buffer, nullptr);
-	});
 
-	VkMemoryRequirements memReq;
-	vkGetBufferMemoryRequirements(mDevice, vertexBuffer, &memReq);
+	mAllocator = Allocator(mPhysicalDevice, mDevice, mInstance);
 
-	VkMemoryAllocateInfo allocInfo = {
-		.sType			 = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-		.allocationSize	 = memReq.size,
-		.memoryTypeIndex = findMemoryType(
-			mPhysicalDevice, memReq.memoryTypeBits,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-		)
-	};
-	VkDeviceMemory vertexMemory;
-	vkAllocateMemory(mDevice, &allocInfo, NULL, &vertexMemory);
+	mVertexBuffer =
+		mAllocator.createBuffer(1_MB, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 
-	mMemory = RAIIed<VkDeviceMemory>(vertexMemory, [device = static_cast<VkDevice>(mDevice)](auto memory) noexcept {
-		if (memory)
-			vkFreeMemory(device, memory, nullptr);
-	});
+	mIndexBuffer =
+		mAllocator.createBuffer(1_MB, VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 
-	vkBindBufferMemory(mDevice, vertexBuffer, vertexMemory, 0);
 
-	void* data;
-	vkMapMemory(mDevice, vertexMemory, 0, bufferSize, 0, &data);
-	memcpy(data, vertices, bufferSize);
-	vkUnmapMemory(mDevice, vertexMemory);
+	for (size_t i = 0; i < nFramesInFlight; i++)
+		mUniformBuffers.emplace_back(
+			mAllocator.createBuffer(1_MB, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT)
+		);
+
+
 
 	VkSemaphoreCreateInfo semInfo = {
 		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
@@ -348,12 +411,101 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 					vkDestroyFence(device, fence, nullptr);
 			})
 		);
+
 	}
+
+
+
+	VkDescriptorPoolSize poolSize {};
+	poolSize.type			 = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSize.descriptorCount = static_cast<uint32_t>(nFramesInFlight);
+
+	VkDescriptorPoolCreateInfo poolInfo {};
+	poolInfo.sType		   = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.poolSizeCount = 1;
+	poolInfo.pPoolSizes	   = &poolSize;
+	poolInfo.maxSets	   = static_cast<uint32_t>(nFramesInFlight);
+
+	VkDescriptorPool descriptorPool;
+	assert(vkCreateDescriptorPool(mDevice, &poolInfo, nullptr, &descriptorPool) == VK_SUCCESS);
+
+
+	std::vector<VkDescriptorSetLayout> layouts(nFramesInFlight, mDescriptor);
+	VkDescriptorSetAllocateInfo		   allocInfo {};
+	allocInfo.sType				 = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool	 = descriptorPool;
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(nFramesInFlight);
+	allocInfo.pSetLayouts		 = layouts.data();
+
+
+
+	mDescriptorSets.resize(nFramesInFlight);
+
+	assert(vkAllocateDescriptorSets(mDevice, &allocInfo, mDescriptorSets.data()) == VK_SUCCESS);
+
+
+	mDescriptorPool = RAIIed<VkDescriptorPool>(
+		descriptorPool, [device = static_cast<VkDevice>(mDevice)](VkDescriptorPool pool) noexcept {
+			if (pool)
+				vkDestroyDescriptorPool(device, pool, nullptr);
+		}
+	);
+
+
 
 	return true;
 }
 
-void RenderSystem::render() {
+
+
+struct Vertex {
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 uv;
+};
+
+
+static uint32_t totalIndices;
+
+
+bool RenderSystem::uploadStaticData(StaticRenderPacket& statics, IResourceCache& cache) noexcept {
+	
+	std::vector<Vertex> vertices(statics.totalVertexCount);
+	std::vector<uint32_t> indices(statics.totalIndexCount);
+
+	std::size_t vertexOffset = 0;
+	std::size_t indexOffset = 0;
+
+	for (auto id : statics.meshes) {
+		auto data = cache.getMesh(id);
+
+		for (size_t i = 0; i < data.position.size(); ++i)
+			vertices[i] = Vertex {
+				.position = data.position[i],
+				//.normal = data.normal[i],
+				//.uv = data.uv[i],
+			};
+
+
+		indices = data.indices;
+
+
+
+		vertexOffset += data.position.size();
+		indexOffset += data.indices.size();
+
+	}
+
+	std::memcpy(mVertexBuffer.mapped, vertices.data(), vertices.size() * sizeof(Vertex));
+	std::memcpy(mIndexBuffer.mapped, indices.data(), indices.size() * sizeof(uint32_t));
+
+	totalIndices = indices.size();
+
+	return true;
+}
+
+
+void RenderSystem::render(DynamicRenderPacket& dynamics, IResourceCache& cache) {
 	auto cmd = mCommandBuffers.at(currentFrame);
 
 	vkWaitForFences(mDevice, 1, &static_cast<const VkFence&>(mInFlightFence[currentFrame]), VK_TRUE, UINT64_MAX);
@@ -420,6 +572,9 @@ void RenderSystem::render() {
 
 	vkCmdBeginRendering(cmd, &renderingInfo);
 
+
+
+
 	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline);
 
 	VkViewport viewport = {0.0f, 0.0f, (float) size.width, (float) size.height, 0.0f, 1.0f};
@@ -430,10 +585,39 @@ void RenderSystem::render() {
 	vkCmdSetViewport(cmd, 0, 1, &viewport);
 	vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-	VkDeviceSize offsets[] = {0};
-	vkCmdBindVertexBuffers(cmd, 0, 1, &static_cast<const VkBuffer&>(mVertexBuffer), offsets);
 
-	vkCmdDraw(cmd, 3, 1, 0, 0);
+
+	std::memcpy(mUniformBuffers[currentFrame].mapped, &dynamics.camera, sizeof(glm::mat4));
+
+
+	VkDescriptorBufferInfo bufferInfo{};
+	bufferInfo.buffer = mUniformBuffers[currentFrame].handle;
+	bufferInfo.offset = 0;
+	bufferInfo.range = sizeof(glm::mat4);
+
+	VkWriteDescriptorSet descriptorWrite{};
+	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrite.dstSet = mDescriptorSets[currentFrame];
+	descriptorWrite.dstBinding = 0;
+	descriptorWrite.dstArrayElement = 0;
+	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorWrite.descriptorCount = 1;
+	descriptorWrite.pBufferInfo = &bufferInfo;
+
+	vkUpdateDescriptorSets(mDevice, 1, &descriptorWrite, 0, nullptr);
+
+
+
+	vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipelineLayout, 0, 1, &mDescriptorSets[currentFrame], 0, nullptr);
+
+
+	VkDeviceSize offsets[] = {0};
+	vkCmdBindVertexBuffers(cmd, 0, 1, &mVertexBuffer.handle, offsets);
+	vkCmdBindIndexBuffer(cmd, mIndexBuffer.handle, 0, VK_INDEX_TYPE_UINT32);
+	vkCmdDrawIndexed(cmd, totalIndices, 1, 0, 0, 0);
+
+
+
 
 	vkCmdEndRendering(cmd);
 

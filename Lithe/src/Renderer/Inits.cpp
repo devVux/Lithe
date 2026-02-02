@@ -415,7 +415,7 @@ namespace Pipeline {
 		return shaderModule;
 	}
 
-	std::tuple<std::expected<VkPipelineLayout, E>, std::expected<VkPipeline, E>>
+	std::tuple<std::expected<VkDescriptorSetLayout, E>, std::expected<VkPipelineLayout, E>, std::expected<VkPipeline, E>>
 	createPipeline(VkDevice device, VkExtent2D extent, VkFormat colorAttachmentFormat) {
 		VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
 		colorBlendAttachment.blendEnable						 = VK_FALSE;
@@ -449,29 +449,37 @@ namespace Pipeline {
 
 		VkVertexInputBindingDescription bindingDescription = {};
 		bindingDescription.binding						   = 0;
-		bindingDescription.stride						   = sizeof(float) * 7; // vec3 + vec4
+		bindingDescription.stride						   = sizeof(float) * 8; // vec3 + vec3 + vec2
 		bindingDescription.inputRate					   = VK_VERTEX_INPUT_RATE_VERTEX;
 
-		VkVertexInputAttributeDescription attributeDescriptions[2] = {};
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions = {
+			VkVertexInputAttributeDescription {
+				.location = 0,
+				.binding = 0,
+				.format	= VK_FORMAT_R32G32B32_SFLOAT,
+				.offset = 0,
+			},
+			VkVertexInputAttributeDescription {
+				.location = 1,
+				.binding = 0,
+				.format	= VK_FORMAT_R32G32B32_SFLOAT,
+				.offset	  = sizeof(float) * 3,
+			},
+			VkVertexInputAttributeDescription {
+				.location = 2,
+				.binding = 0,
+				.format	= VK_FORMAT_R32G32_SFLOAT,
+				.offset	  = sizeof(float) * 6,
+			}
+		};
 
-		// position
-		attributeDescriptions[0].binding  = 0;
-		attributeDescriptions[0].location = 0;
-		attributeDescriptions[0].format	  = VK_FORMAT_R32G32B32_SFLOAT;
-		attributeDescriptions[0].offset	  = 0;
-
-		// color
-		attributeDescriptions[1].binding  = 0;
-		attributeDescriptions[1].location = 1;
-		attributeDescriptions[1].format	  = VK_FORMAT_R32G32B32A32_SFLOAT;
-		attributeDescriptions[1].offset	  = sizeof(float) * 3;
 
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType							= VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		vertexInputInfo.vertexBindingDescriptionCount	= 1;
 		vertexInputInfo.pVertexBindingDescriptions		= &bindingDescription;
-		vertexInputInfo.vertexAttributeDescriptionCount = 2;
-		vertexInputInfo.pVertexAttributeDescriptions	= attributeDescriptions;
+		vertexInputInfo.vertexAttributeDescriptionCount	= static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputInfo.pVertexAttributeDescriptions	= attributeDescriptions.data();
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
 		inputAssembly.sType					 = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -527,9 +535,28 @@ namespace Pipeline {
 		dynamicState.dynamicStateCount				  = 2;
 		dynamicState.pDynamicStates					  = dynamicStates;
 
+
+
+		VkDescriptorSetLayoutBinding uboLayoutBinding {
+			.binding		 = 0,
+			.descriptorType	 = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+			.pImmutableSamplers = nullptr,
+		};
+
+		VkDescriptorSetLayoutCreateInfo layoutInfo {};
+		layoutInfo.sType		= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		layoutInfo.bindingCount = 1;
+		layoutInfo.pBindings	= &uboLayoutBinding;
+
+		VkDescriptorSetLayout descriptorSetLayout;
+		vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout);
+
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 		pipelineLayoutInfo.sType					  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount			  = 0;
+		pipelineLayoutInfo.setLayoutCount			  = 1;
+		pipelineLayoutInfo.pSetLayouts				  = &descriptorSetLayout;
 		pipelineLayoutInfo.pushConstantRangeCount	  = 0;
 
 		VkPipelineLayout pipelineLayout;
@@ -556,7 +583,7 @@ namespace Pipeline {
 		vkDestroyShaderModule(device, vertShaderModule, nullptr);
 		vkDestroyShaderModule(device, fragShaderModule, nullptr);
 
-		return {pipelineLayout, graphicsPipeline};
+		return {descriptorSetLayout, pipelineLayout, graphicsPipeline};
 	}
 
 } // namespace
