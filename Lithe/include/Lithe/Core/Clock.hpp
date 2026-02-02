@@ -1,7 +1,8 @@
 #pragma once
 
-namespace Lithe {
+#include <chrono>
 
+namespace Lithe {
 
 using Timestep = double;
 
