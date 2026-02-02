@@ -15,6 +15,7 @@ namespace Lithe {
 		};
 	};
 	using Pos = Size;
+	using MousePos = Size;
 
 	enum class State: uint8_t {
 		PRESSED,
