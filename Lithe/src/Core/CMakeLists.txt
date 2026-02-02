@@ -12,10 +12,12 @@ set(LT_CORE_INCLUDE_DIR "${LITHE_INCLUDE_DIR}/Lithe/Core")
 
 ## Dependencies
 find_package(spdlog REQUIRED)
+find_package(glm REQUIRED)
 
 target_link_libraries(Core
     PUBLIC
         spdlog::spdlog
+        glm::glm-header-only
 )
 
 
