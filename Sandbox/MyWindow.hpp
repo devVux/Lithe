@@ -25,7 +25,9 @@ public:
 	[[nodiscard]] Lithe::NativeHandle native() const noexcept override;
 	[[nodiscard]] Lithe::Size size() const noexcept override;
 
+	[[nodiscard]] struct GLFWwindow* glfwHandle() const noexcept { return pWindow; }
+
 private:
 
-	struct GLFWwindow* pWindow;
+	struct GLFWwindow* pWindow { nullptr };
 };
