@@ -40,7 +40,6 @@ target_include_directories(Renderer
 target_sources(Renderer
     PRIVATE
         "RenderSystem.cpp"
-        "Inits.cpp"
         "Allocator.cpp"
 
     PUBLIC
