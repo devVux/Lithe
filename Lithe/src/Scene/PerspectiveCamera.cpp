@@ -1,40 +1,54 @@
 #include "PerspectiveCamera.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/ext/quaternion_trigonometric.hpp>
 
 namespace Lithe {
 
-PerspectiveCamera::PerspectiveCamera(const glm::vec3& position, const glm::vec3& target, const glm::vec3& up): 
-	mPosition(position), mTarget(target),
-	mProjection(glm::perspective(mFOV, (16.0f / 9.0f), -100.0f, 1.0f)),
-	mView(glm::lookAt(position, target, up)) {
+PerspectiveCamera::PerspectiveCamera(EventDispatcher& dispatcher, glm::vec3 position, glm::vec3 target): 
+ 	mPosition(position),
+	mProjection(glm::perspectiveRH_ZO(glm::radians(10.0f), (16.0f / 9.0f), 0.01f, 100.0f)),
+	mView(glm::lookAt(position, target, glm::vec3(0.0f, 1.0f, 0.0f)))
+	{ 
+	
+	
+	}
 
-
-}
+static float angle = 0.0f;
 
 void PerspectiveCamera::update(Timestep ts, IInput& input) noexcept {
+	static constexpr float moveSpeed = 10.0f;
+	static constexpr float rotationSpeed = 1.0f;
 
-	static constexpr auto mSpeed = 1.0f;
-	static constexpr auto scrollSpeed = 1.0f;
-	static constexpr auto zoomSpeed = 1.0f;
+	static constexpr auto worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	if (input.isKeyDown(Key::W))
-		mView = glm::translate(mView, glm::vec3(0, 0, mSpeed * ts));
-	if (input.isKeyDown(Key::S))
-		mView = glm::translate(mView, glm::vec3(0, 0, -mSpeed * ts));
-
-	if (input.isKeyDown(Key::A))
-		mView = glm::translate(mView, glm::vec3(mSpeed * ts, 0, 0));
-	if (input.isKeyDown(Key::D))
-		mView = glm::translate(mView, glm::vec3(-mSpeed * ts, 0, 0));
+	float velocity = moveSpeed * ts;
 
 	if (input.isKeyDown(Key::Q))
-		mView = glm::rotate(mView, mSpeed * (float) ts, glm::vec3(0, mSpeed * ts, 0));
+		angle += glm::radians(-rotationSpeed);
 	if (input.isKeyDown(Key::E))
-		mView = glm::rotate(mView, mSpeed * (float) ts, glm::vec3(0, -mSpeed * ts, 0));
+		angle += glm::radians(rotationSpeed);
 
+	glm::vec3 front;
+	front.x = sin(angle);
+	front.y = 0.0f;
+	front.z = -cos(angle);
+	front = glm::normalize(front);
+
+	glm::vec3 right = glm::normalize(glm::cross(front, worldUp));
+
+	if (input.isKeyDown(Key::W))
+		mPosition += front * velocity;
+	if (input.isKeyDown(Key::S))
+		mPosition += -front * velocity;
+	if (input.isKeyDown(Key::A))
+		mPosition += -right * velocity;
+	if (input.isKeyDown(Key::D))
+		mPosition += right * velocity;
+
+	glm::vec3 target = mPosition + front;
+
+	mView = glm::lookAtRH(mPosition, target, worldUp);
 }
 
-
 }
-
