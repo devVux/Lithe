@@ -72,6 +72,9 @@ private:
 
 	Allocator mAllocator;
 
+	std::vector<Image> mDepthImages;
+	std::vector<RAIIed<VkImageView>> mDepthImageViews;
+
 };
 
 } // namespace Lithe

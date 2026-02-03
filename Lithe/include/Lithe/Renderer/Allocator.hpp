@@ -17,6 +17,12 @@ struct Buffer {
 	void* mapped { nullptr };
 };
 
+struct Image {
+	VkImage handle { VK_NULL_HANDLE };
+	VmaAllocation allocation { VK_NULL_HANDLE };
+	void* mapped { nullptr };
+};
+
 class Allocator {
 
 	public:
@@ -31,7 +37,9 @@ class Allocator {
 			cleanup();
 		}
 
-		Buffer createBuffer(VkDeviceSize, VkBufferUsageFlags, Mapped);
+		Buffer createBuffer(VkDeviceSize, VkBufferUsageFlags, Mapped) noexcept;
+		//Buffer createImage(VkDeviceSize, VkBufferUsageFlags, Mapped);
+		Image createDepthImage(uint32_t width, uint32_t height, uint32_t depth = 1) noexcept;
 
 
 	private:
@@ -42,6 +50,7 @@ class Allocator {
 	
 		VmaAllocator mAllocator { VK_NULL_HANDLE };
 		std::vector<Buffer> mBuffers;
+		std::vector<Image> mImages;
 
 };
 

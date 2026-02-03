@@ -133,7 +133,7 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 			.and_then([&](InitContext ctx) -> std::expected<InitContext, E> {
 				LT_LOG_TRACE("Creating swapchain");
 
-				auto result = Swapchain::create(mPhysicalDevice, mDevice, mSurface, {800, 600}, mIndices);
+				auto result = Swapchain::create(mPhysicalDevice, mDevice, mSurface, ctx.extent, mIndices);
 				if (!result)
 					return std::unexpected(result.error());
 
@@ -368,6 +368,37 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 	);
 
 
+	mDepthImages.resize(nFramesInFlight);
+	mDepthImageViews.resize(nFramesInFlight);
+
+	for (auto i = 0; i < nFramesInFlight; i++) {
+
+		auto depthImage = mAllocator.createDepthImage(result->extent.width, result->extent.height);
+
+		VkImageViewCreateInfo depthViewInfo{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+			.image = depthImage.handle,
+			.viewType = VK_IMAGE_VIEW_TYPE_2D,
+			.format = VK_FORMAT_D32_SFLOAT,
+			.subresourceRange = {
+				.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			}
+		};
+
+		VkImageView depthImageView;
+		assert(vkCreateImageView(mDevice, &depthViewInfo, nullptr, &depthImageView) == VK_SUCCESS);
+
+
+		mDepthImages[i] = depthImage;
+
+		mDepthImageViews[i] = RAIIed<VkImageView>(depthImageView, [device = static_cast<VkDevice>(mDevice)](auto view) noexcept {
+			if (view)
+				vkDestroyImageView(device, view, nullptr);
+		});
 
 	return true;
 }
@@ -385,9 +416,6 @@ bool RenderSystem::uploadStaticData(StaticRenderPacket& statics, IResourceCache&
 	std::vector<Vertex> vertices(cache.countVertices());
 	std::vector<uint32_t> indices(cache.countIndices());
 
-	std::size_t vertexOffset = 0;
-	std::size_t indexOffset = 0;
-
 	for (auto id : statics.meshes) {
 		auto data = cache.getMesh(id);
 
@@ -400,11 +428,6 @@ bool RenderSystem::uploadStaticData(StaticRenderPacket& statics, IResourceCache&
 
 
 		indices = data.indices;
-
-
-
-		vertexOffset += data.position.size();
-		indexOffset += data.indices.size();
 
 	}
 
@@ -430,6 +453,31 @@ void RenderSystem::render(DynamicRenderPacket& dynamics, IResourceCache& cache) 
 		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, .flags = 0, .pInheritanceInfo = nullptr
 	};
 	vkBeginCommandBuffer(cmd, &cmdBeginInfo);
+
+	VkImageMemoryBarrier depthBarrier{};
+	depthBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	depthBarrier.srcAccessMask = 0;
+	depthBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+	depthBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	depthBarrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	depthBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	depthBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	depthBarrier.image = mDepthImages[currentFrame].handle;
+	depthBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+	depthBarrier.subresourceRange.baseMipLevel = 0;
+	depthBarrier.subresourceRange.levelCount = 1;
+	depthBarrier.subresourceRange.baseArrayLayer = 0;
+	depthBarrier.subresourceRange.layerCount = 1;
+
+	vkCmdPipelineBarrier(
+		cmd,
+		VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+		VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+		0,
+		0, nullptr,
+		0, nullptr,
+		1, &depthBarrier
+	);
 
 	VkImageMemoryBarrier barrier {};
 	barrier.sType							= VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -461,13 +509,13 @@ void RenderSystem::render(DynamicRenderPacket& dynamics, IResourceCache& cache) 
 		 {0.0f, 0.0f, 0.0f, 1.0f}
 	 };
 
-	// VkRenderingAttachmentInfo depthAttachment = {};
-	// depthAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-	// depthAttachment.imageView = depthImageView;
-	// depthAttachment.imageLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
-	// depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	// depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	// depthAttachment.clearValue.depthStencil = {1.0f, 0};
+	 VkRenderingAttachmentInfo depthAttachment = {};
+	 depthAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+	 depthAttachment.imageView = mDepthImageViews[currentFrame];
+	 depthAttachment.imageLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+	 depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	 depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	 depthAttachment.clearValue.depthStencil = {1.0f, 0};
 
 	VkExtent2D size {800, 600};
 
@@ -478,7 +526,7 @@ void RenderSystem::render(DynamicRenderPacket& dynamics, IResourceCache& cache) 
 	renderingInfo.layerCount		   = 1;
 	renderingInfo.colorAttachmentCount = 1;
 	renderingInfo.pColorAttachments	   = &colorAttachment;
-	// renderingInfo.pDepthAttachment = &depthAttachment;
+	renderingInfo.pDepthAttachment = &depthAttachment;
 
 	vkCmdBeginRendering(cmd, &renderingInfo);
 
@@ -487,7 +535,14 @@ void RenderSystem::render(DynamicRenderPacket& dynamics, IResourceCache& cache) 
 
 	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipeline);
 
-	VkViewport viewport = {0.0f, 0.0f, (float) size.width, (float) size.height, 0.0f, 1.0f};
+	VkViewport viewport = {};
+	viewport.x = 0.0f;
+	viewport.y = 0.0f;
+	viewport.width = (float)size.width;
+	viewport.height = (float)size.height;
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+
 	VkRect2D   scissor	= {
 		   {			0,		   0},
 		   {size.width, size.height}
