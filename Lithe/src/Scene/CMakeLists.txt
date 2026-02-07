@@ -32,7 +32,6 @@ target_include_directories(Scene
 target_sources(Scene
 	PRIVATE
 		"Scene.cpp"
-		"OrthographicCamera.cpp"
 		"PerspectiveCamera.cpp"
 
 
@@ -42,6 +41,5 @@ target_sources(Scene
         FILES
             "${LT_SCENE_INCLUDE_DIR}/Scene.hpp"
             "${LT_SCENE_INCLUDE_DIR}/ResourceCache.hpp"
-            "${LT_SCENE_INCLUDE_DIR}/OrthographicCamera.hpp"
             "${LT_SCENE_INCLUDE_DIR}/PerspectiveCamera.hpp"
 )
