@@ -98,6 +98,10 @@ struct RAIIed {
 	RAIIed& operator=(const RAIIed&) = delete;
 	RAIIed& operator=(RAIIed&&)		 = default;
 
+	T& get() noexcept {
+		return t;
+	}
+
 	operator const T&() const noexcept { return t; }
 };
 

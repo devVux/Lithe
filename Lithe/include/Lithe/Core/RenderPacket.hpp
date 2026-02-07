@@ -1,16 +1,14 @@
 #pragma once
 
-#include "IDs.hpp"
+#include "RenderData.hpp"
 
 #include <vector>
 #include <glm/glm.hpp>
 
 namespace Lithe {
 
-// TODO: use function instead of single error-prone inserts
 struct StaticRenderPacket {
-	std::vector<glm::mat4> transforms;
-	std::vector<MeshID> meshes;
+	std::vector<InstanceData> instances;
 };
 
 struct DynamicRenderPacket {

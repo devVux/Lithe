@@ -9,27 +9,79 @@ class ResourceCache: public IResourceCache {
 	public:
 
 		[[nodiscard]] MeshData getMesh(MeshID id) const noexcept { 
-			return meshes[id];
+			return mMeshes[static_cast<std::size_t>(id)];
 		}
 
-		[[nodiscard]] bool addMesh(MeshData data) noexcept override {
-			mVertexCount += data.position.size();
+		[[nodiscard]] std::optional<MeshID> addMesh(MeshData data) noexcept {
+			mVertexCount += data.positions.size();
 			mIndexCount += data.indices.size();
-			meshes.emplace_back(std::move(data));
+			mMeshes.emplace_back(std::move(data));
 
-			return true;
+			return static_cast<MeshID>(mMeshes.size() - 1);
 		}
 
+		[[nodiscard]] MaterialData getMaterial(MaterialID id) const noexcept {
+			return mMaterials[static_cast<std::size_t>(id)];
+		}
+		[[nodiscard]] std::optional<MaterialID> addMaterial(MaterialData data) noexcept {
+			mMaterials.emplace_back(std::move(data));
 
-		[[nodiscard]] virtual std::size_t countVertices() const noexcept { return mVertexCount; }
-		[[nodiscard]] virtual std::size_t countIndices() const noexcept { return mIndexCount; }
+			return static_cast<MaterialID>(mMaterials.size() - 1);
+		}
+
+		[[nodiscard]] TextureData getTexture(TextureID id) const noexcept {
+			return mTextures[static_cast<std::size_t>(id)];
+		}
+		[[nodiscard]] std::optional<TextureID> addTexture(TextureData data) noexcept {
+			if (data.width * data.height > mLargestTexture.width * mLargestTexture.height)
+				mLargestTexture = { data.width, data.height };
+				
+			mTextures.emplace_back(std::move(data));
+
+			return static_cast<TextureID>(mTextures.size() - 1);
+		}
+		
+
+		[[nodiscard]] std::size_t vertexCount() const noexcept { return mVertexCount; }
+		[[nodiscard]] std::size_t indexCount() const noexcept { return mIndexCount; }
+		[[nodiscard]] std::size_t materialCount() const noexcept { return mMaterials.size(); }
+		[[nodiscard]] std::size_t textureCount() const noexcept { return mTextures.size(); }
+		[[nodiscard]] Size largestTexture() const noexcept { return mLargestTexture; }
+
+		[[nodiscard]] std::vector<std::pair<MeshID, MeshData>> meshes() const noexcept override {
+			std::vector<std::pair<MeshID, MeshData>> result;
+			for (std::size_t i = 0; i < mMeshes.size(); ++i)
+				result.emplace_back(std::make_pair(static_cast<MeshID>(i), mMeshes[i]));
+				
+			return result;
+		}
+
+		[[nodiscard]] std::vector<std::pair<MaterialID, MaterialData>> materials() const noexcept override {
+			std::vector<std::pair<MaterialID, MaterialData>> result;
+			for (std::size_t i = 0; i < mMaterials.size(); ++i)
+				result.emplace_back(std::make_pair(static_cast<MaterialID>(i), mMaterials[i]));
+				
+			return result;
+		}
+
+		[[nodiscard]] std::vector<std::pair<TextureID, TextureData>> textures() const noexcept override {
+			std::vector<std::pair<TextureID, TextureData>> result;
+			for (std::size_t i = 0; i < mTextures.size(); ++i)
+				result.emplace_back(std::make_pair(static_cast<TextureID>(i), mTextures[i]));
+
+			return result;
+		}
+
 
 	private:
 
 		std::size_t mVertexCount = 0;
 		std::size_t mIndexCount = 0;
+		Size mLargestTexture { 0, 0 };
 
-		std::vector<MeshData> meshes;
+		std::vector<MeshData> mMeshes;
+		std::vector<MaterialData> mMaterials;
+		std::vector<TextureData> mTextures;
 
 };
 
