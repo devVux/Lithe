@@ -19,12 +19,14 @@ class IResourceCache {
 		[[nodiscard]] virtual std::optional<MaterialID> addMaterial(MaterialData) noexcept = 0;
 
 		[[nodiscard]] virtual TextureData getTexture(TextureID) const noexcept = 0;
-		[[nodiscard]] virtual std::optional<TextureID> addTextre(TextureData) noexcept = 0;
+		[[nodiscard]] virtual std::optional<TextureID> addTexture(TextureData) noexcept = 0;
 
 		[[nodiscard]] virtual std::size_t vertexCount() const noexcept = 0;
 		[[nodiscard]] virtual std::size_t indexCount() const noexcept = 0;
 		[[nodiscard]] virtual std::size_t materialCount() const noexcept = 0;
 		[[nodiscard]] virtual std::size_t textureCount() const noexcept = 0;
+
+		[[nodiscard]] virtual Size largestTexture() const noexcept = 0;
 
 
 		// TODO: revisit this
