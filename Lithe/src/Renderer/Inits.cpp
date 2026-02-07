@@ -254,13 +254,23 @@ namespace Device {
 			.dynamicRendering = VK_TRUE,
 		};
 
+		VkPhysicalDeviceVulkan12Features features {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+			.pNext = (void*) &dynamicRenderingFeature,
+			.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
+			.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
+			.descriptorBindingPartiallyBound = VK_TRUE,
+			.runtimeDescriptorArray = VK_TRUE,
+		};
+
+
 		VkDeviceCreateInfo createInfo {
 			.sType					 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-			.pNext					 = &dynamicRenderingFeature,
+			.pNext					 = &features,
 			.queueCreateInfoCount	 = static_cast<uint32_t>(queueCreateInfos.size()),
 			.pQueueCreateInfos		 = queueCreateInfos.data(),
 			.enabledExtensionCount	 = 1,
-			.ppEnabledExtensionNames = deviceExtensions
+			.ppEnabledExtensionNames = deviceExtensions,
 		};
 
 		VkDevice device;
@@ -415,7 +425,7 @@ namespace Pipeline {
 		return shaderModule;
 	}
 
-	std::tuple<std::expected<VkDescriptorSetLayout, E>, std::expected<VkPipelineLayout, E>, std::expected<VkPipeline, E>>
+	std::tuple<std::vector<VkDescriptorSetLayout>, std::expected<VkPipelineLayout, E>, std::expected<VkPipeline, E>>
 	createPipeline(VkDevice device, VkExtent2D extent, VkFormat colorAttachmentFormat) {
 		VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
 		colorBlendAttachment.blendEnable						 = VK_FALSE;
@@ -523,27 +533,95 @@ namespace Pipeline {
 		dynamicState.pDynamicStates					  = dynamicStates;
 
 
-
-		VkDescriptorSetLayoutBinding uboLayoutBinding {
-			.binding		 = 0,
-			.descriptorType	 = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-			.pImmutableSamplers = nullptr,
+		// set 0
+		std::vector<VkDescriptorSetLayoutBinding> set0Bindings {
+			{
+				.binding			= 0,
+				.descriptorType		= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+				.descriptorCount	= 1,
+				.stageFlags			= VK_SHADER_STAGE_VERTEX_BIT,
+				.pImmutableSamplers = nullptr,
+			}
 		};
+
+		// set 1
+		std::vector<VkDescriptorSetLayoutBinding> set1Bindings {
+			{
+				.binding			= 0,
+				.descriptorType		= VK_DESCRIPTOR_TYPE_SAMPLER,
+				.descriptorCount	= 1,
+				.stageFlags			= VK_SHADER_STAGE_FRAGMENT_BIT,
+				.pImmutableSamplers = nullptr,
+			},
+			{
+				.binding			= 1,
+				.descriptorType		= VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+				.descriptorCount	= 10,
+				.stageFlags			= VK_SHADER_STAGE_FRAGMENT_BIT,
+				.pImmutableSamplers = nullptr,
+			},
+			{
+				.binding			= 2,
+				.descriptorType		= VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+				.descriptorCount	= 1,
+				.stageFlags			= VK_SHADER_STAGE_FRAGMENT_BIT,
+				.pImmutableSamplers = nullptr,
+			}
+		};
+		
+
+		// set 2
+		std::vector<VkDescriptorSetLayoutBinding> set2Bindings {
+			{
+				.binding			= 0,
+				.descriptorType		= VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+				.descriptorCount	= 1,
+				.stageFlags			= VK_SHADER_STAGE_VERTEX_BIT,
+				.pImmutableSamplers = nullptr,
+			}
+		};
+		
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts(3);
+
+
 
 		VkDescriptorSetLayoutCreateInfo layoutInfo {};
 		layoutInfo.sType		= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		layoutInfo.bindingCount = 1;
-		layoutInfo.pBindings	= &uboLayoutBinding;
+		layoutInfo.pNext = nullptr;
+		layoutInfo.bindingCount = static_cast<uint32_t>(set0Bindings.size());
+		layoutInfo.pBindings	= set0Bindings.data();
+		vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayouts[0]);
 
-		VkDescriptorSetLayout descriptorSetLayout;
-		vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout);
+
+		// For bindless textures
+		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flagsInfo{};
+		flagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
+		std::vector<VkDescriptorBindingFlags> bindingFlags = {
+			0,
+			VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
+			0
+		};
+		flagsInfo.bindingCount = static_cast<uint32_t>(bindingFlags.size());
+		flagsInfo.pBindingFlags = bindingFlags.data();
+
+		layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT;
+		layoutInfo.pNext = &flagsInfo;
+		layoutInfo.bindingCount = static_cast<uint32_t>(set1Bindings.size());
+		layoutInfo.pBindings = set1Bindings.data();
+		vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayouts[1]);
+
+
+		layoutInfo.pNext = nullptr;
+		layoutInfo.bindingCount = static_cast<uint32_t>(set2Bindings.size());
+		layoutInfo.pBindings	= set2Bindings.data();
+		vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayouts[2]);
+
+
 
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 		pipelineLayoutInfo.sType					  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount			  = 1;
-		pipelineLayoutInfo.pSetLayouts				  = &descriptorSetLayout;
+		pipelineLayoutInfo.setLayoutCount			  = static_cast<uint32_t>(descriptorSetLayouts.size());
+		pipelineLayoutInfo.pSetLayouts				  = descriptorSetLayouts.data();
 		pipelineLayoutInfo.pushConstantRangeCount	  = 0;
 
 		VkPipelineLayout pipelineLayout;
@@ -570,7 +648,7 @@ namespace Pipeline {
 		vkDestroyShaderModule(device, vertShaderModule, nullptr);
 		vkDestroyShaderModule(device, fragShaderModule, nullptr);
 
-		return {descriptorSetLayout, pipelineLayout, graphicsPipeline};
+		return {descriptorSetLayouts, pipelineLayout, graphicsPipeline};
 	}
 
 } // namespace

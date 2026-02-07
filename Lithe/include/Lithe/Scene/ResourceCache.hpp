@@ -42,11 +42,12 @@ class ResourceCache: public IResourceCache {
 		}
 		
 
-		[[nodiscard]] std::size_t vertexCount() const noexcept { return mVertexCount; }
-		[[nodiscard]] std::size_t indexCount() const noexcept { return mIndexCount; }
-		[[nodiscard]] std::size_t materialCount() const noexcept { return mMaterials.size(); }
-		[[nodiscard]] std::size_t textureCount() const noexcept { return mTextures.size(); }
-		[[nodiscard]] Size largestTexture() const noexcept { return mLargestTexture; }
+		[[nodiscard]] std::size_t vertexCount() const noexcept override { return mVertexCount; }
+		[[nodiscard]] std::size_t indexCount() const noexcept override { return mIndexCount; }
+		[[nodiscard]] std::size_t materialCount() const noexcept override { return mMaterials.size(); }
+		[[nodiscard]] std::size_t textureCount() const noexcept override { return mTextures.size(); }
+
+		[[nodiscard]] Size largestTexture() const noexcept override { return mLargestTexture; }
 
 		[[nodiscard]] std::vector<std::pair<MeshID, MeshData>> meshes() const noexcept override {
 			std::vector<std::pair<MeshID, MeshData>> result;

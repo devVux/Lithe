@@ -48,7 +48,11 @@ private:
 
 	RAIIed<VkPipeline>		 mPipeline;
 	RAIIed<VkPipelineLayout> mPipelineLayout;
-	RAIIed<VkDescriptorSetLayout> mDescriptorSetLayout;
+	RAIIed<std::vector<VkDescriptorSetLayout>> mDescriptorSetLayouts;
+
+	RAIIed<VkDescriptorPool> mDescriptorPool;
+	std::vector<VkDescriptorSet> mPersistentDescriptorSets;
+	std::vector<std::vector<VkDescriptorSet>> mDynamicDescriptorSets;
 
 	RAIIed<VkCommandPool>		 mCommandPool;
 	std::vector<VkCommandBuffer> mCommandBuffers;
@@ -60,17 +64,20 @@ private:
 
 	Buffer mVertexBuffer;
 	Buffer mIndexBuffer;
+	Buffer mStorageBuffer;
+	Buffer mMaterialBuffer;
 	std::vector<Buffer> mUniformBuffers;
+
+	RAIIed<VkSampler> mGlobalSampler;
 
 	VkQueue mGraphicsQueue;
 	VkQueue mPresentQueue;
+	VkQueue mTransferQueue;
 
 	std::vector<RAIIed<VkSemaphore>> mImageAvailableSemaphore;
 	std::vector<RAIIed<VkSemaphore>> mRenderFinishedSemaphore;
 	std::vector<RAIIed<VkFence>>	 mInFlightFence;
 
-	RAIIed<VkDescriptorPool> mDescriptorPool;
-	std::vector<VkDescriptorSet> mDescriptorSets;
 
 	Allocator mAllocator;
 
