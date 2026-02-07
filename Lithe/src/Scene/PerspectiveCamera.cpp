@@ -5,10 +5,10 @@
 
 namespace Lithe {
 
-PerspectiveCamera::PerspectiveCamera(EventDispatcher& dispatcher, glm::vec3 position, glm::vec3 target): 
+PerspectiveCamera::PerspectiveCamera(glm::vec3 position, glm::vec3 target): 
  	mPosition(position),
-	mProjection(glm::perspectiveRH_ZO(glm::radians(10.0f), (16.0f / 9.0f), 0.01f, 100.0f)),
-	mView(glm::lookAt(position, target, glm::vec3(0.0f, 1.0f, 0.0f)))
+	mProjection(glm::perspectiveRH_ZO(glm::radians(60.0f), (16.0f / 9.0f), 0.01f, 100.0f)),
+	mView(glm::lookAtRH(position, target, glm::vec3(0.0f, 1.0f, 0.0f)))
 	{ 
 	
 	
@@ -17,8 +17,8 @@ PerspectiveCamera::PerspectiveCamera(EventDispatcher& dispatcher, glm::vec3 posi
 static float angle = 0.0f;
 
 void PerspectiveCamera::update(Timestep ts, IInput& input) noexcept {
-	static constexpr float moveSpeed = 10.0f;
-	static constexpr float rotationSpeed = 1.0f;
+	static constexpr float moveSpeed = 15.0f;
+	static constexpr float rotationSpeed = 0.75f;
 
 	static constexpr auto worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 

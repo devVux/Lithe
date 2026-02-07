@@ -11,7 +11,7 @@ class PerspectiveCamera: public ICamera {
 
 	public:
 
-		PerspectiveCamera(EventDispatcher&, glm::vec3 position, glm::vec3 target);
+		PerspectiveCamera(glm::vec3 position, glm::vec3 target);
 
 		void update(Timestep, IInput&) noexcept override;
 
