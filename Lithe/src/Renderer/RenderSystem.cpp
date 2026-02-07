@@ -146,6 +146,7 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 			.and_then([&](InitContext ctx) -> std::expected<InitContext, E> {
 				LT_LOG_TRACE("Creating logical device");
 
+				// TODO: provide required queues
 				auto device = Device::create(mPhysicalDevice, mIndices);
 				if (!device)
 					return std::unexpected(device.error());
@@ -184,14 +185,14 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 			.and_then([&](InitContext ctx) -> std::expected<InitContext, E> {
 				uint32_t count;
 				vkGetSwapchainImagesKHR(mDevice, mSwapchain, &count, nullptr);
-				mImages.resize(count);
-				vkGetSwapchainImagesKHR(mDevice, mSwapchain, &count, mImages.data());
+				mSwapchainImages.resize(count);
+				vkGetSwapchainImagesKHR(mDevice, mSwapchain, &count, mSwapchainImages.data());
 
 				LT_LOG_TRACE("Creating {} image views", count);
 
-				mImageViews.reserve(count);
+				mSwapchainImageViews.reserve(count);
 
-				for (auto img : mImages) {
+				for (auto img : mSwapchainImages) {
 					VkImageView			  view;
 					VkImageViewCreateInfo info {
 						.sType			  = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
@@ -210,7 +211,7 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 					if (vkCreateImageView(mDevice, &info, nullptr, &view) != VK_SUCCESS)
 						return std::unexpected(E::Unknown);
 
-					mImageViews.emplace_back(
+					mSwapchainImageViews.emplace_back(
 						view, [device = static_cast<VkDevice>(mDevice)](VkImageView view) noexcept {
 							if (view)
 								vkDestroyImageView(device, view, nullptr);
@@ -225,12 +226,12 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 				LT_LOG_TRACE("Creating pipeline");
 				auto [descriptor, layout, pipe] = Pipeline::createPipeline(mDevice, ctx.extent, ctx.surfaceFormat.format);
 
-				if (!descriptor || !layout || !pipe)
+				if (!layout || !pipe)
 					return std::unexpected(E::Unknown);
 
-				mDescriptorSetLayout = RAIIed<VkDescriptorSetLayout>(
-					*descriptor, [device = static_cast<VkDevice>(mDevice)](VkDescriptorSetLayout layout) noexcept {
-						if (layout)
+				mDescriptorSetLayouts = RAIIed<std::vector<VkDescriptorSetLayout>>(
+					descriptor, [device = static_cast<VkDevice>(mDevice)](std::vector<VkDescriptorSetLayout> setLayouts) noexcept {
+						for (auto& layout : setLayouts)
 							vkDestroyDescriptorSetLayout(device, layout, nullptr);
 					}
 				);
@@ -319,7 +320,7 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
 	};
 
-	for (int i = 0; i < mImageViews.size(); i++) {
+	for (int i = 0; i < mSwapchainImages.size(); i++) {
 		VkSemaphore renderFinishedSemaphore;
 		vkCreateSemaphore(mDevice, &semInfo, NULL, &renderFinishedSemaphore);
 
@@ -430,6 +431,9 @@ bool RenderSystem::init(ISurface& surface, std::set<Extension> extensions) {
 			if (view)
 				vkDestroyImageView(device, view, nullptr);
 		});
+
+	}
+
 
 	return true;
 }

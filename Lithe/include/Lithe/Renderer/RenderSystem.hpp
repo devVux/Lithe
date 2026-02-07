@@ -30,10 +30,10 @@ class RenderSystem {
 public:
 
 	~RenderSystem() noexcept;
-	bool init(ISurface&, std::set<Extension> = {});
+	bool init(ISurface&, std::set<Extension> = {}) noexcept;
 
 	bool uploadStaticData(StaticRenderPacket&, IResourceCache&) noexcept;
-	void render(DynamicRenderPacket&, IResourceCache&);
+	void render(DynamicRenderPacket&, IResourceCache&) noexcept;
 
 private:
 
@@ -53,6 +53,8 @@ private:
 	RAIIed<VkCommandPool>		 mCommandPool;
 	std::vector<VkCommandBuffer> mCommandBuffers;
 
+	std::vector<VkImage>			 mSwapchainImages;
+	std::vector<RAIIed<VkImageView>> mSwapchainImageViews;
 	std::vector<VkImage>			 mImages;
 	std::vector<RAIIed<VkImageView>> mImageViews;
 
