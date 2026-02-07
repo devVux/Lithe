@@ -3,6 +3,7 @@
 #include "ForwardDecls.hpp"
 
 #include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace Lithe {
 
@@ -19,6 +20,11 @@ struct Buffer {
 
 struct Image {
 	VkImage handle { VK_NULL_HANDLE };
+	VmaAllocation allocation { VK_NULL_HANDLE };
+};
+
+struct Sampler {
+	VkSampler handle { VK_NULL_HANDLE };
 	VmaAllocation allocation { VK_NULL_HANDLE };
 	void* mapped { nullptr };
 };
@@ -38,7 +44,7 @@ class Allocator {
 		}
 
 		Buffer createBuffer(VkDeviceSize, VkBufferUsageFlags, Mapped) noexcept;
-		//Buffer createImage(VkDeviceSize, VkBufferUsageFlags, Mapped);
+		Image createImage(uint32_t, uint32_t, VkFormat format, VkBufferUsageFlags) noexcept;
 		Image createDepthImage(uint32_t width, uint32_t height, uint32_t depth = 1) noexcept;
 
 
