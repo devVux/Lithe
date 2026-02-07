@@ -32,6 +32,37 @@ constexpr size_t operator""_GB(unsigned long long v) {
 }
 
 
+
+namespace Render {
+
+struct Vertex {
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 uv;
+};
+
+using Index = uint32_t;
+
+struct CameraUBO {
+	glm::mat4 viewProjection;
+};
+
+struct alignas(16) MaterialData {
+	glm::vec4 color;
+	uint32_t albedoTextureIndex;
+	uint32_t pad[3];
+};
+
+
+struct alignas(16) InstanceData {
+	glm::mat4 model;
+	uint32_t materialIndex;
+	uint32_t textureIndex;
+	uint32_t pad[2];
+};
+
+}
+
 static int currentFrame	   = 0;
 static int nFramesInFlight = 2;
 
