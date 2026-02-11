@@ -1,10 +1,11 @@
 #pragma once
 
+#include "Allocator.hpp"
+#include "DebugLayer.hpp"
 #include "ForwardDecls.hpp"
+#include "IResourceCache.hpp"
 #include "ISurface.hpp"
 #include "RenderPacket.hpp"
-#include "IResourceCache.hpp"
-#include "Allocator.hpp"
 
 #include <optional>
 #include <set>
@@ -13,7 +14,6 @@
 namespace Lithe {
 
 using Extension = std::string;
-
 
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
@@ -24,16 +24,16 @@ struct QueueFamilyIndices {
 	bool covers(uint32_t requiredQueues, bool needsPreset) const noexcept;
 };
 
-
 class RenderSystem {
 
 public:
 
 	~RenderSystem() noexcept;
-	bool init(ISurface&, std::set<Extension> = {}) noexcept;
+	bool init(EventDispatcher&, ISurface&, std::set<Extension> = {}) noexcept;
 
 	bool uploadStaticData(StaticRenderPacket&, IResourceCache&) noexcept;
 	void render(DynamicRenderPacket&, IResourceCache&) noexcept;
+	void renderOverlay() noexcept;
 
 private:
 
@@ -46,26 +46,32 @@ private:
 	RAIIed<VkSurfaceKHR>   mSurface;
 	RAIIed<VkSwapchainKHR> mSwapchain;
 
-	RAIIed<VkPipeline>		 mPipeline;
-	RAIIed<VkPipelineLayout> mPipelineLayout;
+	RAIIed<VkPipeline>						   mPipeline;
+	RAIIed<VkPipelineLayout>				   mPipelineLayout;
 	RAIIed<std::vector<VkDescriptorSetLayout>> mDescriptorSetLayouts;
 
-	RAIIed<VkDescriptorPool> mDescriptorPool;
-	std::vector<VkDescriptorSet> mPersistentDescriptorSets;
+	RAIIed<VkDescriptorPool>				  mDescriptorPool;
+	std::vector<VkDescriptorSet>			  mPersistentDescriptorSets;
 	std::vector<std::vector<VkDescriptorSet>> mDynamicDescriptorSets;
 
-	RAIIed<VkCommandPool>		 mCommandPool;
-	std::vector<VkCommandBuffer> mCommandBuffers;
+	RAIIed<VkCommandPool> mCommandPool;
+
+	struct FrameResources {
+		VkCommandBuffer scene;
+		VkCommandBuffer overlay;
+	};
+
+	std::vector<FrameResources> mCommandBuffers;
 
 	std::vector<VkImage>			 mSwapchainImages;
 	std::vector<RAIIed<VkImageView>> mSwapchainImageViews;
 	std::vector<VkImage>			 mImages;
 	std::vector<RAIIed<VkImageView>> mImageViews;
 
-	Buffer mVertexBuffer;
-	Buffer mIndexBuffer;
-	Buffer mStorageBuffer;
-	Buffer mMaterialBuffer;
+	Buffer				mVertexBuffer;
+	Buffer				mIndexBuffer;
+	Buffer				mStorageBuffer;
+	Buffer				mMaterialBuffer;
 	std::vector<Buffer> mUniformBuffers;
 
 	RAIIed<VkSampler> mGlobalSampler;
@@ -77,13 +83,14 @@ private:
 	std::vector<RAIIed<VkSemaphore>> mImageAvailableSemaphore;
 	std::vector<RAIIed<VkSemaphore>> mRenderFinishedSemaphore;
 	std::vector<RAIIed<VkFence>>	 mInFlightFence;
-
+	std::vector<RAIIed<VkSemaphore>> mSceneRenderedSemaphore;
 
 	Allocator mAllocator;
 
-	std::vector<Image> mDepthImages;
+	std::vector<Image>				 mDepthImages;
 	std::vector<RAIIed<VkImageView>> mDepthImageViews;
 
+	DebugLayer debugLayer;
 };
 
 } // namespace Lithe

@@ -1,6 +1,5 @@
 
 #include "Log.hpp"
-#include "SurfaceFactory.hpp"
 #include "RenderSystem.hpp"
 
 #include <algorithm>
@@ -10,22 +9,18 @@
 #include <optional>
 #include <set>
 #include <vector>
-
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
 namespace Lithe {
 
-	
 struct InitContext {
 	VkDebugUtilsMessengerEXT debugMessenger {nullptr};
 	VkSurfaceFormatKHR		 surfaceFormat;
 	VkExtent2D				 extent;
 };
 
-
 namespace Validation {
-
 
 	VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -97,9 +92,7 @@ namespace Validation {
 	}
 
 	std::expected<std::pair<VkInstance, InitContext>, E> createInstance(
-		const std::set<Extension>&										extensions,
-		const std::set<std::string>&									layers,
-		bool															hasValidationLayer = false
+		const std::set<Extension>& extensions, const std::set<std::string>& layers, bool hasValidationLayer = false
 	) {
 		VkApplicationInfo appInfo {
 			.sType				= VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -148,7 +141,7 @@ namespace Validation {
 		}
 
 		InitContext ctx;
-		VkInstance instance;
+		VkInstance	instance;
 		if (!supportsLayers(layers) || vkCreateInstance(&instanceInfo, nullptr, &instance) != VK_SUCCESS)
 			return std::unexpected {E::Unknown};
 
@@ -159,7 +152,7 @@ namespace Validation {
 		return std::make_pair(instance, ctx);
 	}
 
-} // namespace
+} // namespace Validation
 
 namespace Device {
 
@@ -255,14 +248,13 @@ namespace Device {
 		};
 
 		VkPhysicalDeviceVulkan12Features features {
-			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
-			.pNext = (void*) &dynamicRenderingFeature,
-			.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
+			.sType										  = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+			.pNext										  = (void*) &dynamicRenderingFeature,
+			.shaderSampledImageArrayNonUniformIndexing	  = VK_TRUE,
 			.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE,
-			.descriptorBindingPartiallyBound = VK_TRUE,
-			.runtimeDescriptorArray = VK_TRUE,
+			.descriptorBindingPartiallyBound			  = VK_TRUE,
+			.runtimeDescriptorArray						  = VK_TRUE,
 		};
-
 
 		VkDeviceCreateInfo createInfo {
 			.sType					 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
@@ -280,7 +272,7 @@ namespace Device {
 		return device;
 	}
 
-} // namespace
+} // namespace Device
 
 namespace Swapchain {
 
@@ -303,7 +295,7 @@ namespace Swapchain {
 
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
 		for (const auto& availablePresentMode : availablePresentModes)
-			if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR)
+			if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
 				return availablePresentMode;
 
 		return VK_PRESENT_MODE_FIFO_KHR;
@@ -397,7 +389,7 @@ namespace Swapchain {
 		return SwapchainCreationInfo {swapchain, surfaceFormat, presentMode, extent};
 	}
 
-} // namespace
+} // namespace Swapchain
 
 namespace Pipeline {
 
@@ -464,38 +456,36 @@ namespace Pipeline {
 
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions = {
 			VkVertexInputAttributeDescription {
-				.location = 0,
-				.binding = 0,
-				.format	= VK_FORMAT_R32G32B32_SFLOAT,
-				.offset = 0,
-			},
+											   .location = 0,
+											   .binding  = 0,
+											   .format	  = VK_FORMAT_R32G32B32_SFLOAT,
+											   .offset	  = 0,
+											   },
 			VkVertexInputAttributeDescription {
-				.location = 1,
-				.binding = 0,
-				.format	= VK_FORMAT_R32G32B32_SFLOAT,
-				.offset	  = sizeof(float) * 3,
-			},
+											   .location = 1,
+											   .binding  = 0,
+											   .format	  = VK_FORMAT_R32G32B32_SFLOAT,
+											   .offset	  = sizeof(float) * 3,
+											   },
 			VkVertexInputAttributeDescription {
-				.location = 2,
-				.binding = 0,
-				.format	= VK_FORMAT_R32G32_SFLOAT,
-				.offset	  = sizeof(float) * 6,
-			}
+											   .location = 2,
+											   .binding  = 0,
+											   .format	  = VK_FORMAT_R32G32_SFLOAT,
+											   .offset	  = sizeof(float) * 6,
+											   }
 		};
-
 
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType							= VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		vertexInputInfo.vertexBindingDescriptionCount	= 1;
 		vertexInputInfo.pVertexBindingDescriptions		= &bindingDescription;
-		vertexInputInfo.vertexAttributeDescriptionCount	= static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
 		vertexInputInfo.pVertexAttributeDescriptions	= attributeDescriptions.data();
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
 		inputAssembly.sType					 = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		inputAssembly.topology				 = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
-
 
 		VkPipelineViewportStateCreateInfo viewportState = {};
 		viewportState.sType								= VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -532,7 +522,6 @@ namespace Pipeline {
 		dynamicState.dynamicStateCount				  = 2;
 		dynamicState.pDynamicStates					  = dynamicStates;
 
-
 		// set 0
 		std::vector<VkDescriptorSetLayoutBinding> set0Bindings {
 			{
@@ -541,7 +530,7 @@ namespace Pipeline {
 				.descriptorCount	= 1,
 				.stageFlags			= VK_SHADER_STAGE_VERTEX_BIT,
 				.pImmutableSamplers = nullptr,
-			}
+			 }
 		};
 
 		// set 1
@@ -552,23 +541,22 @@ namespace Pipeline {
 				.descriptorCount	= 1,
 				.stageFlags			= VK_SHADER_STAGE_FRAGMENT_BIT,
 				.pImmutableSamplers = nullptr,
-			},
+			 },
 			{
 				.binding			= 1,
 				.descriptorType		= VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
 				.descriptorCount	= 10,
 				.stageFlags			= VK_SHADER_STAGE_FRAGMENT_BIT,
 				.pImmutableSamplers = nullptr,
-			},
+			 },
 			{
 				.binding			= 2,
 				.descriptorType		= VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 				.descriptorCount	= 1,
 				.stageFlags			= VK_SHADER_STAGE_FRAGMENT_BIT,
 				.pImmutableSamplers = nullptr,
-			}
+			 }
 		};
-		
 
 		// set 2
 		std::vector<VkDescriptorSetLayoutBinding> set2Bindings {
@@ -578,45 +566,37 @@ namespace Pipeline {
 				.descriptorCount	= 1,
 				.stageFlags			= VK_SHADER_STAGE_VERTEX_BIT,
 				.pImmutableSamplers = nullptr,
-			}
+			 }
 		};
-		
+
 		std::vector<VkDescriptorSetLayout> descriptorSetLayouts(3);
-
-
 
 		VkDescriptorSetLayoutCreateInfo layoutInfo {};
 		layoutInfo.sType		= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		layoutInfo.pNext = nullptr;
+		layoutInfo.pNext		= nullptr;
 		layoutInfo.bindingCount = static_cast<uint32_t>(set0Bindings.size());
 		layoutInfo.pBindings	= set0Bindings.data();
 		vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayouts[0]);
 
-
 		// For bindless textures
-		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flagsInfo{};
+		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flagsInfo {};
 		flagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
 		std::vector<VkDescriptorBindingFlags> bindingFlags = {
-			0,
-			VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
-			0
+			0, VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT, 0
 		};
-		flagsInfo.bindingCount = static_cast<uint32_t>(bindingFlags.size());
+		flagsInfo.bindingCount	= static_cast<uint32_t>(bindingFlags.size());
 		flagsInfo.pBindingFlags = bindingFlags.data();
 
-		layoutInfo.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT;
-		layoutInfo.pNext = &flagsInfo;
+		layoutInfo.flags		= VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT;
+		layoutInfo.pNext		= &flagsInfo;
 		layoutInfo.bindingCount = static_cast<uint32_t>(set1Bindings.size());
-		layoutInfo.pBindings = set1Bindings.data();
+		layoutInfo.pBindings	= set1Bindings.data();
 		vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayouts[1]);
 
-
-		layoutInfo.pNext = nullptr;
+		layoutInfo.pNext		= nullptr;
 		layoutInfo.bindingCount = static_cast<uint32_t>(set2Bindings.size());
 		layoutInfo.pBindings	= set2Bindings.data();
 		vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayouts[2]);
-
-
 
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 		pipelineLayoutInfo.sType					  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -651,8 +631,7 @@ namespace Pipeline {
 		return {descriptorSetLayouts, pipelineLayout, graphicsPipeline};
 	}
 
-} // namespace
-
+} // namespace Pipeline
 
 bool QueueFamilyIndices::covers(uint32_t requiredQueues, bool needsPreset) const noexcept {
 	if ((requiredQueues & VK_QUEUE_GRAPHICS_BIT) and not graphicsFamily.has_value())
@@ -667,6 +646,4 @@ bool QueueFamilyIndices::covers(uint32_t requiredQueues, bool needsPreset) const
 	return true;
 }
 
-
-
-}
+} // namespace Lithe

@@ -17,14 +17,16 @@ message(STATUS "Compiling shaders to ${SHADER_OUTPUT_DIR}")
 ## Dependencies
 find_package(Vulkan REQUIRED)
 find_package(VulkanMemoryAllocator REQUIRED)
+find_package(Imgui REQUIRED)
 find_program(GLSLC glslc REQUIRED)
 
 target_link_libraries(Renderer
     PRIVATE
-        Vulkan::Vulkan
-        Vulkan::Headers
-        GPUOpen::VulkanMemoryAllocator
-        Core
+		Core
+		Vulkan::Headers
+		Vulkan::Vulkan
+		GPUOpen::VulkanMemoryAllocator
+		imgui::imgui
 )
 
 
@@ -35,12 +37,12 @@ target_include_directories(Renderer
         $<INSTALL_INTERFACE:include>
 )
 
-
 ## Sources
 target_sources(Renderer
     PRIVATE
         "RenderSystem.cpp"
         "Allocator.cpp"
+		"DebugLayer.cpp"
 
     PUBLIC
         FILE_SET HEADERS
@@ -50,13 +52,14 @@ target_sources(Renderer
             "${LT_RENDERER_INCLUDE_DIR}/RenderSystem.hpp"
             "${LT_RENDERER_INCLUDE_DIR}/SurfaceFactory.hpp"
             "${LT_RENDERER_INCLUDE_DIR}/Allocator.hpp"
+			"${LT_RENDERER_INCLUDE_DIR}/DebugLayer.hpp"
 )
 
 if(WIN32)
-    target_sources(Renderer
-        PRIVATE
-           "Platform/Windows/Win32Surface.cpp"
-    )
+	target_sources(Renderer
+		PRIVATE
+		   "Platform/Windows/Win32Surface.cpp"
+	)
 elseif(UNIX AND NOT APPLE)
 	target_sources(Renderer
 		PRIVATE

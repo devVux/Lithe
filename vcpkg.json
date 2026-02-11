@@ -1,22 +1,26 @@
 {
-  "builtin-baseline": "6d332a018c433fad20822ff4b536e4ccdc3413bd",
-  "dependencies": [
-    "vulkan",
-    "vulkan-memory-allocator",
-    "shaderc",
-    "entt",
-    "spdlog",
-    "glm",
-    {
-      "name": "glfw3",
-      "features": [
-        "wayland"
-      ],
-      "platform": "linux"
-    },
-    {
-      "name": "glfw3",
-      "platform": "!linux"
-    }
-  ]
+	"builtin-baseline": "6d332a018c433fad20822ff4b536e4ccdc3413bd",
+	"dependencies": [
+		"vulkan-memory-allocator",
+		{
+			"name": "imgui",
+			"features": [
+				"vulkan-binding"
+			]
+		},
+		"entt",
+		"spdlog",
+		"glm",
+		{
+			"name": "glfw3",
+			"features": [
+				"wayland"
+			],
+			"platform": "linux"
+		},
+		{
+			"name": "glfw3",
+			"platform": "!linux"
+		}
+	]
 }

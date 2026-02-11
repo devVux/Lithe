@@ -2,7 +2,7 @@
 vcpkg_installed/
 out/
 
-
+imgui.ini
 
 ##### Windows
 # Windows thumbnail cache files
