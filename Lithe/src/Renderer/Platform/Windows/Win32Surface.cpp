@@ -6,7 +6,7 @@
 
 namespace Lithe::SurfaceFactory {
 
-std::expected<VkSurfaceKHR, DefaultError> createSurface(VkInstance instance, ISurface& surface) {
+std::expected<VkSurfaceKHR, E> createSurface(VkInstance instance, ISurface& surface) {
 	VkSurfaceKHR vkSurface;
 	VkWin32SurfaceCreateInfoKHR info = {};
 	info.sType						 = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
@@ -15,7 +15,7 @@ std::expected<VkSurfaceKHR, DefaultError> createSurface(VkInstance instance, ISu
 	auto res						 = vkCreateWin32SurfaceKHR(instance, &info, nullptr, &vkSurface);
 
 	if (res != VK_SUCCESS)
-		return std::unexpected(DefaultError::Unknown);
+		return std::unexpected(E::Unknown);
 
 	return vkSurface;
 }

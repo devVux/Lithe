@@ -35,6 +35,8 @@ int main() {
 	std::vector<Extension> glfwExtensions(glfwExts, glfwExts + glfwExtensionCount);
 #if defined(GLFW_EXPOSE_NATIVE_X11) || defined(GLFW_EXPOSE_NATIVE_WAYLAND)
 	glfwExtensions.push_back("VK_KHR_xlib_surface");
+#elif defined(GLFW_EXPOSE_NATIVE_WAYLAND)
+	glfwExtensions.push_back("VK_KHR_wayland_surface");
 #endif
 
 	bool running = true;

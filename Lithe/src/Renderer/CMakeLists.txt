@@ -57,7 +57,14 @@ if(WIN32)
         PRIVATE
            "Platform/Windows/Win32Surface.cpp"
     )
+elseif(UNIX AND NOT APPLE)
+	target_sources(Renderer
+		PRIVATE
+			$<$<BOOL:${USE_WAYLAND}>:Platform/Linux/WaylandSurface.cpp>
+			$<$<NOT:$<BOOL:${USE_WAYLAND}>>:Platform/Linux/X11Surface.cpp>
+	)
 endif()
+
 
 ## Shader Compilation
 file(GLOB_RECURSE SHADER_SOURCES CONFIGURE_DEPENDS

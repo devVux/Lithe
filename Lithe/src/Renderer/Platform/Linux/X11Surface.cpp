@@ -1,22 +1,23 @@
 #include "SurfaceFactory.hpp"
 
 #include <X11/Xlib.h>
+#include <vulkan/vulkan.h>
 #include <vulkan/vulkan_xlib.h>
 
-namespace Lithe { 
-	std::expected<VkSurfaceKHR, Error> createSurface(VkInstance instance, ISurface& surface) { }
+namespace Lithe::SurfaceFactory {
+std::expected<VkSurfaceKHR, E> createSurface(VkInstance instance, ISurface& surface) {
 
-		VkSurfaceKHR vkSurface;
+	VkSurfaceKHR vkSurface;
 
-		VkWaylandSurfaceCreateInfoKHR info {
-			.sType	 = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR,
-			.display = static_cast<wl_display*>(surface.native().display),
-			.surface = static_cast<wl_surface*>(surface.native().handle.ptr),
-		};
+	VkXlibSurfaceCreateInfoKHR info = {};
+	info.sType						= VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+	info.dpy						= static_cast<Display*>(surface.native().display);
+	info.window						= surface.native().handle.id;
+	auto res						= vkCreateXlibSurfaceKHR(instance, &info, nullptr, &vkSurface);
+	if (res != VK_SUCCESS)
+		return std::unexpected(E::Unknown);
 
-		auto res = vkCreateWaylandSurfaceKHR(instance, &info, nullptr, &vkSurface);
-		if (res != VK_SUCCESS)
-			return std::unexpected(Error::Unknown);
-
-		return vkSurface;
+	return vkSurface;
 }
+
+} // namespace Lithe::SurfaceFactory

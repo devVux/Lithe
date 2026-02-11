@@ -126,7 +126,7 @@ void MyWindow::update(EventDispatcher&) const noexcept {
 }
 
 Lithe::Size MyWindow::size() const noexcept {
-	int width = 0;
+	int width  = 0;
 	int height = 0;
 
 	glfwGetWindowSize(pWindow, &width, &height);
